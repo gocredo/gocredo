@@ -10,6 +10,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id        String   @id @default(uuid())
+  clientId   String
+  client     Client   @relation(fields: [clientId], references: [id])
+  name      String
+  email     String   @unique
+  password  String
+  role      String   // e.g., 'admin', 'developer', 'sales'
+  createdAt DateTime @default(now())
+}
+
 model Client {
   id         String    @id @default(uuid())
   name       String
@@ -36,6 +47,8 @@ model Website {
 
 model Cart {
   id         String    @id @default(uuid())
+  clientId   String
+  client     Client   @relation(fields: [clientId], references: [id])
   websiteId  String    @unique
   website    Website   @relation(fields: [websiteId], references: [id])
   items      CartItem[]
@@ -47,7 +60,8 @@ model Cart {
 
 model Product {
   id          String   @id @default(uuid())
-  clientId    String
+  clientId   String
+  client     Client   @relation(fields: [clientId], references: [id])
   websiteId   String
   website     Website @relation(fields: [websiteId], references: [id])
   name        String
@@ -62,6 +76,8 @@ model Product {
 
 model ProductReview {
   id         String   @id @default(uuid())
+  clientId   String
+  client     Client   @relation(fields: [clientId], references: [id])
   productId  String
   product    Product @relation(fields: [productId], references: [id])
   customerId String
@@ -73,6 +89,8 @@ model ProductReview {
 
 model CartItem {
   id         String   @id @default(uuid())
+  clientId   String
+  client     Client   @relation(fields: [clientId], references: [id])
   cartId     String
   cart       Cart     @relation(fields: [cartId], references: [id])
   productId  String
@@ -101,6 +119,8 @@ model Payment {
   id         String   @id @default(uuid())
   orderId    String
   order      Order    @relation(fields: [orderId], references: [id])
+  clientId   String
+  client     Client   @relation(fields: [clientId], references: [id])
   amount     Float
   method     String   // Razorpay, Stripe, etc.
   status     String   // success, failed, pending
@@ -111,6 +131,8 @@ model Payment {
 model Lead {
   id         String   @id @default(uuid())
   websiteId  String
+  clientId   String
+  client     Client   @relation(fields: [clientId], references: [id])
   website    Website @relation(fields: [websiteId], references: [id])
   name       String
   email      String
@@ -121,6 +143,7 @@ model Lead {
 model ClientCustomer {
   id         String   @id @default(uuid())
   clientId   String
+  client     Client   @relation(fields: [clientId], references: [id])
   websiteId  String
   name       String
   password   String
