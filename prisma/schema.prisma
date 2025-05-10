@@ -1,5 +1,5 @@
-
-
+// Prisma schema for a high-end SaaS platform supporting a wide variety of small to medium-sized businesses
+// Each model is carefully structured to serve real-world needs such as menu displays, appointment systems, e-commerce, content, etc.
 generator client {
   provider = "prisma-client-js"
  
@@ -7,147 +7,380 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = env("DATABASE_URL")  
 }
-
+// -------------------------------------------
+// User model - Each business owner or admin/staff of a business has a unique user account
+// Can be extended for permissions, multi-role access, and audit logging
 model User {
-  id        String   @id @default(uuid())
-  clientId   String
-  client     Client   @relation(fields: [clientId], references: [id])
-  name      String
-  email     String   @unique
-  password  String
-  role      String   // e.g., 'admin', 'developer', 'sales'
-  createdAt DateTime @default(now())
-}
-
-model Client {
   id         String    @id @default(uuid())
-  name       String
-  email      String    @unique
-  phone      String?
-  websites   Website[]
+  email      String    @unique // Used for login and identification
+  password   String // Hashed password for security
+  name       String // Full name of the user
+  role       Role      @default(BUSINESS_OWNER) // Role: ADMIN, BUSINESS_OWNER, or STAFF
+  business   Business? @relation(fields: [businessId], references: [id])
+  businessId String?
+  websiteURLs String[]
   createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 }
 
-model Website {
+enum Role {
+  ADMIN
+  BUSINESS_OWNER
+  STAFF
+}
+
+// -------------------------------------------
+// Business model - Represents any client type: salon, restaurant, clinic, NGO, boutique etc.
+// Central to all linked data like products, menus, bookings, payments etc.
+model Business {
+  id           String           @id @default(uuid())
+  name         String // Brand or company name
+  category     BusinessCategory // Predefined categories
+  description  String? // About the business
+  address      String?
+  phone        String?
+  websiteUrl   String?
+  users        User[] // Admins/staff managing this business
+  menus        Menu[] // For food businesses like restaurants, tiffin services
+  appointments Appointment[] // For salons, clinics, pet services
+  products     Product[] // For boutiques, stores, ecommerce
+  reviews      Review[] // Customer feedback
+  bookings     Booking[] // For gyms, studios, services
+  galleries    MediaGallery[] // Portfolio of work e.g. photographers, decorators
+  inquiries    Inquiry[] // Contact forms, leads
+  properties   Property[] // Real estate listings
+  donations    Donation[] // For NGOs and donation based setups
+  blogs        Blog[] // For content, SEO, announcements
+  branches     Branch[] // Multi-location support
+  payments     Payment[] // Online transactions and tracking
+  customers    CustomerUser[]
+  orders       Order[]
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+}
+
+enum BusinessCategory {
+  RESTAURANT
+  SALON
+  BOUTIQUE
+  TIFFIN
+  GYM
+  EVENT_PLANNER
+  COACHING
+  INTERIOR
+  PHOTOGRAPHER
+  REPAIR_SERVICE
+  REAL_ESTATE
+  PET_SERVICE
+  HANDICRAFT
+  FLORIST
+  CLINIC
+  TRAVEL
+  FREELANCER
+  BAKER
+  NGO
+  JEWELLERY
+}
+
+// -------------------------------------------
+// For businesses with multiple outlets
+model Branch {
   id         String   @id @default(uuid())
-  clientId   String
-  client     Client   @relation(fields: [clientId], references: [id])
   name       String
-  domain     String   @unique  // abc.com, etc.
-  theme      Json?    // colors, fonts, layout config
-  logoUrl    String?
-  products   Product[]
-  orders     Order[]
-  cart       Cart?
-  lead       Lead[]
+  address    String
+  city       String
+  state      String
+  pincode    String
+  phone      String?
+  business   Business @relation(fields: [businessId], references: [id])
+  businessId String
   createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
 
-model Cart {
-  id         String    @id @default(uuid())
-  clientId   String
-  client     Client   @relation(fields: [clientId], references: [id])
-  websiteId  String    @unique
-  website    Website   @relation(fields: [websiteId], references: [id])
-  items      CartItem[]
-  order      Order[]
-  createdAt  DateTime  @default(now())
+model CustomerUser {
+  id         String   @id @default(uuid())
+  name       String
+  email      String?
+  phone      String?
+  business   Business @relation(fields: [businessId], references: [id])
+  businessId String
+  orders     Order[]
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
 
+// -------------------------------------------
+// Payments for orders, appointments, product sales etc.
+model Payment {
+  id                String        @id @default(uuid())
+  amount            Float
+  method            PaymentMethod
+  status            PaymentStatus @default(PENDING)
+  initiatedAt      DateTime
+  verifiedAt        DateTime?
+  paidAt            DateTime?
+  referenceId       String? // Internal or Razorpay reference
+  razorpayOrderId   String? // Razorpay order ID
+  razorpayPaymentId String? // Razorpay payment ID
+  razorpaySignature String? // Signature for verification
+  receiptURL        String?
+  customerRole      Role
+  customerName      String?
+  customerEmail     String?
+  business          Business      @relation(fields: [businessId], references: [id])
+  businessId        String
 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
 
+enum PaymentMethod {
+  CARD
+  UPI
+  CASH
+  WALLET
+  NETBANKING
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  REFUNDED
+}
+
+// -------------------------------------------
+// Used by restaurants, tiffin services, bakers, etc.
+model Menu {
+  id         String     @id @default(uuid())
+  title      String
+  items      MenuItem[]
+  business   Business   @relation(fields: [businessId], references: [id])
+  businessId String
+}
+
+model MenuItem {
+  id       String  @id @default(uuid())
+  name     String
+  price    Float
+  imageUrl String?
+  menu     Menu    @relation(fields: [menuId], references: [id])
+  menuId   String
+}
+
+// -------------------------------------------
+// Appointment-based businesses like salons, clinics, gyms etc.
+model Appointment {
+  id            String            @id @default(uuid())
+  customerName  String
+  customerPhone String?
+  customerEmail String?
+  dateTime      DateTime
+  service       String
+  status        AppointmentStatus @default(PENDING)
+  business      Business          @relation(fields: [businessId], references: [id])
+  businessId    String
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
+// -------------------------------------------
+// E-commerce products: fashion, gift shops, jewellery, art
 model Product {
   id          String   @id @default(uuid())
-  clientId   String
-  client     Client   @relation(fields: [clientId], references: [id])
-  websiteId   String
-  website     Website @relation(fields: [websiteId], references: [id])
   name        String
-  description String?
   price       Float
-  imageUrl    String?
-  Stock       Int      @default(0)
-  inStock     Boolean  @default(true)
-  cartsItem   CartItem[]
-  reviews     ProductReview[]
+  stock       Int?
+  tags        String[]
+  description String?
+  imageUrl    String
+  business    Business @relation(fields: [businessId], references: [id])
+  businessId  String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
-model ProductReview {
+// -------------------------------------------
+// Customer reviews and ratings
+model Review {
   id         String   @id @default(uuid())
-  clientId   String
-  client     Client   @relation(fields: [clientId], references: [id])
-  productId  String
-  product    Product @relation(fields: [productId], references: [id])
-  customerId String
-  rating     Int      // 1 to 5 stars
+  customer   String
+  rating     Int // Typically out of 5
   comment    String?
-  createdAt  DateTime @default(now())
+  business   Business @relation(fields: [businessId], references: [id])
+  businessId String
 }
 
+// -------------------------------------------
+// Used by service businesses for booking slots (gyms, decorators, etc.)
+model Booking {
+  id           String   @id @default(uuid())
+  dateTime     DateTime
+  customerName String
+  service      String
+  business     Business @relation(fields: [businessId], references: [id])
+  businessId   String
+}
 
-model CartItem {
+// -------------------------------------------
+// For photographers, interior designers, decorators
+model MediaGallery {
   id         String   @id @default(uuid())
-  clientId   String
-  client     Client   @relation(fields: [clientId], references: [id])
-  cartId     String
-  cart       Cart     @relation(fields: [cartId], references: [id])
-  productId  String
-  product    Product  @relation(fields: [productId], references: [id])
-  quantity   Int      @default(1)
-  price      Float
+  title      String
+  mediaUrls  String[] // List of images/videos
+  business   Business @relation(fields: [businessId], references: [id])
+  businessId String
+}
+
+// -------------------------------------------
+// Contact or inquiry form submission
+model Inquiry {
+  id         String   @id @default(uuid())
+  name       String
+  email      String
+  message    String
+  business   Business @relation(fields: [businessId], references: [id])
+  businessId String
+}
+
+// -------------------------------------------
+// Real estate properties listing for agents/agencies
+model Property {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  price       Float
+  location    String
+  imageUrl    String?
+  business    Business @relation(fields: [businessId], references: [id])
+  businessId  String
+}
+
+// -------------------------------------------
+// Donations tracking for NGOs, foundations, fundraising
+model Donation {
+  id         String   @id @default(uuid())
+  donorName  String
+  amount     Float
+  date       DateTime
+  business   Business @relation(fields: [businessId], references: [id])
+  businessId String
+}
+
+// -------------------------------------------
+// Blogs or articles - can be used for SEO, awareness, storytelling
+model Blog {
+  id         String   @id @default(uuid())
+  title      String
+  content    String
+  imageUrl   String?
+  business   Business @relation(fields: [businessId], references: [id])
+  businessId String
   createdAt  DateTime @default(now())
 }
 
 model Order {
+  id             String        @id @default(uuid())
+  type           OrderType
+  items          Json // Store flexible item info
+  totalAmount    Float
+  status         OrderStatus   @default(PENDING)
+  customerUser   CustomerUser? @relation(fields: [customerUserId], references: [id])
+  customerUserId String?
+
+  business   Business @relation(fields: [businessId], references: [id])
+  businessId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum OrderType {
+  PRODUCT
+  MENU_ITEM
+  APPOINTMENT
+  DONATION
+  CUSTOM
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  CANCELLED
+  FULFILLED
+}
+
+//Tracks who did what, useful for admins, compliance, or rollback
+model AuditLog {
   id          String   @id @default(uuid())
-  websiteId   String
-  website     Website @relation(fields: [websiteId], references: [id])
-  customer    String
+  action      String   // 'CREATE_PRODUCT', 'DELETE_USER', etc.
+  userId      String
+  businessId  String
+  timestamp   DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id])
+  business    Business @relation(fields: [businessId], references: [id])
+  businessId String
+}
+
+//Handle inviting users to join a business (e.g., team members or staff)
+model Invitation {
+  id          String   @id @default(uuid())
   email       String
-  products    Json     // List of product ids and quantity
-  totalAmount Float
-  status      String   // pending, paid, failed
-  cartId      String   // FK for the cart converted into order
-  cart        Cart     @relation(fields: [cartId], references: [id])
-  payment     Payment[]
-  createdAt   DateTime @default(now())
+  role        String   // 'Admin', 'Staff'
+  token       String   @unique
+  businessId  String
+  expiresAt   DateTime
+
+  business    Business @relation(fields: [businessId], references: [id])
+  businessId String
 }
 
-model Payment {
-  id         String   @id @default(uuid())
-  orderId    String
-  order      Order    @relation(fields: [orderId], references: [id])
-  clientId   String
-  client     Client   @relation(fields: [clientId], references: [id])
-  amount     Float
-  method     String   // Razorpay, Stripe, etc.
-  status     String   // success, failed, pending
-  provider   String   // Payment provider
-  createdAt  DateTime @default(now())
+//Store per-business configuration, like currency, language, branding, etc
+model BusinessSettings {
+  id          String   @id @default(uuid())
+  businessId  String   @unique
+  currency    String   @default("USD")
+  timezone    String?
+  logoUrl     String?
+  business    Business @relation(fields: [businessId], references: [id])
+  businessId String
 }
 
-model Lead {
-  id         String   @id @default(uuid())
-  websiteId  String
-  clientId   String
-  client     Client   @relation(fields: [clientId], references: [id])
-  website    Website @relation(fields: [websiteId], references: [id])
-  name       String
-  email      String
-  message    String
-  createdAt  DateTime @default(now())
+// Plan model - Represents different types of subscription plans available to businesses
+model Plan {
+  id          String    @id @default(uuid())
+  name        String    // Name of the plan (e.g., Basic, Pro, Enterprise)
+  description String?   // Description of the plan
+  price       Float     // Price of the plan (monthly, yearly)
+  features    String[]  // Features available in the plan (e.g., number of staff, storage limits)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  subscriptions Subscription[] // List of subscriptions that are linked to this plan
 }
 
-model ClientCustomer {
-  id         String   @id @default(uuid())
-  clientId   String
-  client     Client   @relation(fields: [clientId], references: [id])
-  websiteId  String
-  name       String
-  password   String
-  email      String
-  username   String   @unique
-  createdAt  DateTime @default(now())
+// Subscription model - Tracks which plan a business has subscribed to
+model Subscription {
+  id           String       @id @default(uuid())
+  business     Business     @relation(fields: [businessId], references: [id])
+  businessId   String       // The business that has the subscription
+  plan         Plan         @relation(fields: [planId], references: [id])
+  planId       String       // The plan that the business has subscribed to
+  startDate    DateTime     @default(now()) // The date when the subscription started
+  endDate      DateTime?    // The date when the subscription will end (optional)
+  status       SubscriptionStatus @default(ACTIVE) // The current status of the subscription
+  lastRenewed  DateTime?    // The date when the subscription was last renewed
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
 }
