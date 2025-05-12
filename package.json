@@ -9,20 +9,20 @@
   "dev": "tsx watch src/app.ts",
   "lint": "eslint src",
   "lint:fix": "eslint src --fix",
-  "prisma:generate":"prisma generate",
-  "prisma:migrate":"prisma migrate dev"
+  "prisma:generate": "prisma generate",
+  "prisma:migrate": "prisma migrate dev"
  },
  "keywords": [],
  "author": "",
  "type": "module",
  "license": "ISC",
  "dependencies": {
-  "@apollo/server": "4.12.0",
+  "@apollo/server": "^4.12.0",
   "@prisma/client": "^6.7.0",
   "cors": "2.8.5",
   "dotenv": "16.5.0",
   "express": "5.1.0",
-  "graphql": "16.11.0",
+  "graphql": "^16.11.0",
   "helmet": "8.1.0",
   "morgan": "1.10.0",
   "prisma": "^6.7.0"
@@ -38,7 +38,7 @@
   "globals": "16.0.0",
   "tsc-alias": "1.8.15",
   "tsx": "4.19.4",
-  "typescript": "5.8.3",
+  "typescript": "^5.8.3",
   "typescript-eslint": "8.31.1"
  }
 }
