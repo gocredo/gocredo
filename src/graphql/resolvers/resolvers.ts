@@ -1,12 +1,16 @@
-
-import { helloWord,newPost } from "@/controllers/graphql.js";
+import { getAllUsers,createUser,updateUser, } from "@/controllers/users";
+import { protectClerkOnlyResolver } from "@/middlewares/protectClerkOnlyResolver";
+import { protectResolver } from "@/middlewares/protectResolver";
+import { getArgumentValues } from "graphql";
 
 export const graphQLResolver = {
     Query: {
-        hello: helloWord,
+        users: getAllUsers,
     },
     Mutation: {
-        addPost:newPost,
-    },
+        createUser:protectClerkOnlyResolver(createUser),
+        updateUser:protectResolver(updateUser),
+        
+    },  
 };
 

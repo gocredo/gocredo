@@ -2,25 +2,26 @@
 // Each model is carefully structured to serve real-world needs such as menu displays, appointment systems, e-commerce, content, etc.
 generator client {
   provider = "prisma-client-js"
- 
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")  
+  url      = env("DATABASE_URL")
 }
+
 // -------------------------------------------
 // User model - Each business owner or admin/staff of a business has a unique user account
 // Can be extended for permissions, multi-role access, and audit logging
 model User {
   id         String    @id @default(uuid())
-  email      String    @unique // Used for login and identification
-  password   String // Hashed password for security
-  name       String // Full name of the user
-  role       Role      @default(BUSINESS_OWNER) // Role: ADMIN, BUSINESS_OWNER, or STAFF
+  clerkId    String    @unique  // Clerk's user ID to link with Clerk auth
+  email      String    @unique
+  name       String
+  role       Role      @default(BUSINESS_OWNER)
   business   Business? @relation(fields: [businessId], references: [id])
   businessId String?
   websiteURLs String[]
+  auditLogs  AuditLog[]
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
 }
@@ -42,7 +43,7 @@ model Business {
   address      String?
   phone        String?
   websiteUrl   String?
-  users        User[] // Admins/staff managing this business
+  users        User[] // Owners/staff managing this business
   menus        Menu[] // For food businesses like restaurants, tiffin services
   appointments Appointment[] // For salons, clinics, pet services
   products     Product[] // For boutiques, stores, ecommerce
@@ -57,8 +58,15 @@ model Business {
   payments     Payment[] // Online transactions and tracking
   customers    CustomerUser[]
   orders       Order[]
-  createdAt    DateTime         @default(now())
-  updatedAt    DateTime         @updatedAt
+  about        AboutPage?
+  auditLogs    AuditLog[]
+  invitations  Invitation[]
+
+  businessSetting    BusinessSettings? @relation(name: "BusinessToBusinessSettings")
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+  businessSettingsId String?
+  Subscription       Subscription[]
 }
 
 enum BusinessCategory {
@@ -119,7 +127,7 @@ model Payment {
   amount            Float
   method            PaymentMethod
   status            PaymentStatus @default(PENDING)
-  initiatedAt      DateTime
+  initiatedAt       DateTime
   verifiedAt        DateTime?
   paidAt            DateTime?
   referenceId       String? // Internal or Razorpay reference
@@ -253,6 +261,15 @@ model Inquiry {
   businessId String
 }
 
+// Used for our main website
+model BusinessInquiry {
+  id      String @id @default(uuid())
+  name    String
+  email   String
+  phone   String
+  message String
+}
+
 // -------------------------------------------
 // Real estate properties listing for agents/agencies
 model Property {
@@ -322,67 +339,69 @@ enum OrderStatus {
 
 //Tracks who did what, useful for admins, compliance, or rollback
 model AuditLog {
-  id          String   @id @default(uuid())
-  action      String   // 'CREATE_PRODUCT', 'DELETE_USER', etc.
-  userId      String
-  businessId  String
-  timestamp   DateTime @default(now())
-
-  user        User     @relation(fields: [userId], references: [id])
-  business    Business @relation(fields: [businessId], references: [id])
+  id         String   @id @default(uuid())
+  action     String // 'CREATE_PRODUCT', 'DELETE_USER', etc.
+  userId     String
   businessId String
+  timestamp  DateTime @default(now())
+
+  user     User     @relation(fields: [userId], references: [id])
+  business Business @relation(fields: [businessId], references: [id])
 }
 
 //Handle inviting users to join a business (e.g., team members or staff)
 model Invitation {
-  id          String   @id @default(uuid())
-  email       String
-  role        String   // 'Admin', 'Staff'
-  token       String   @unique
-  businessId  String
-  expiresAt   DateTime
-
-  business    Business @relation(fields: [businessId], references: [id])
+  id         String   @id @default(uuid())
+  email      String
+  role       String // 'Admin', 'Staff'
+  token      String   @unique
   businessId String
+  expiresAt  DateTime
+
+  business Business @relation(fields: [businessId], references: [id])
 }
 
 //Store per-business configuration, like currency, language, branding, etc
 model BusinessSettings {
-  id          String   @id @default(uuid())
-  businessId  String   @unique
-  currency    String   @default("USD")
-  timezone    String?
-  logoUrl     String?
-  business    Business @relation(fields: [businessId], references: [id])
-  businessId String
+  id         String   @id @default(uuid())
+  businessId String   @unique
+  currency   String   @default("USD")
+  timezone   String?
+  logoUrl    String?
+  business   Business @relation(name: "BusinessToBusinessSettings", fields: [businessId], references: [id])
 }
 
 // Plan model - Represents different types of subscription plans available to businesses
 model Plan {
-  id          String    @id @default(uuid())
-  name        String    // Name of the plan (e.g., Basic, Pro, Enterprise)
-  description String?   // Description of the plan
-  price       Float     // Price of the plan (monthly, yearly)
-  features    String[]  // Features available in the plan (e.g., number of staff, storage limits)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id          String   @id @default(uuid())
+  name        String // Name of the plan (e.g., Basic, Pro, Enterprise)
+  description String? // Description of the plan
+  price       Float // Price of the plan (monthly, yearly)
+  features    String[] // Features available in the plan (e.g., number of staff, storage limits)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   subscriptions Subscription[] // List of subscriptions that are linked to this plan
 }
 
 // Subscription model - Tracks which plan a business has subscribed to
 model Subscription {
-  id           String       @id @default(uuid())
-  business     Business     @relation(fields: [businessId], references: [id])
-  businessId   String       // The business that has the subscription
-  plan         Plan         @relation(fields: [planId], references: [id])
-  planId       String       // The plan that the business has subscribed to
-  startDate    DateTime     @default(now()) // The date when the subscription started
-  endDate      DateTime?    // The date when the subscription will end (optional)
-  status       SubscriptionStatus @default(ACTIVE) // The current status of the subscription
-  lastRenewed  DateTime?    // The date when the subscription was last renewed
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
+  id          String             @id @default(uuid())
+  business    Business           @relation(fields: [businessId], references: [id])
+  businessId  String // The business that has the subscription
+  plan        Plan               @relation(fields: [planId], references: [id])
+  planId      String // The plan that the business has subscribed to
+  startDate   DateTime           @default(now()) // The date when the subscription started
+  endDate     DateTime? // The date when the subscription will end (optional)
+  status      SubscriptionStatus @default(ACTIVE) // The current status of the subscription
+  lastRenewed DateTime? // The date when the subscription was last renewed
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  INACTIVE
 }
 
 model AboutPage {

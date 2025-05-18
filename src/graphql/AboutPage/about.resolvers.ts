@@ -8,7 +8,7 @@ export const resolvers = {
         const {prisma}=context;
         const {businessId}=args;
 
-        return await prisma.AboutPage.findUnique({
+        return await prisma.aboutPage.findUnique({
           where:{businessId}
         });
       }
@@ -27,11 +27,11 @@ export const resolvers = {
           const {prisma}=context;
           const {businessId}=args;
 
-          const existingInfo=await prisma.AboutPage.findUnique({
+          const existingInfo=await prisma.aboutPage.findUnique({
             where:{businessId}
           })
           if(existingInfo){
-            return await prisma.AboutPage.update({
+            return await prisma.aboutPage.update({
               where:{id:existingInfo.id},
               data:{
                 description: args.description,
@@ -41,7 +41,7 @@ export const resolvers = {
             })
           }
 
-          return await prisma.AboutPage.create({
+          return await prisma.aboutPage.create({
             data: {
                 businessId: args.businessId,
                 description: args.description,
