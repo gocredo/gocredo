@@ -13,17 +13,18 @@ datasource db {
 // User model - Each business owner or admin/staff of a business has a unique user account
 // Can be extended for permissions, multi-role access, and audit logging
 model User {
-  id         String    @id @default(uuid())
-  clerkId    String    @unique  // Clerk's user ID to link with Clerk auth
-  email      String    @unique
-  name       String
-  role       Role      @default(BUSINESS_OWNER)
-  business   Business? @relation(fields: [businessId], references: [id])
-  businessId String?
+  id          String     @id @default(uuid())
+  clerkId     String     @unique // Clerk's user ID to link with Clerk auth
+  email       String     @unique
+  name        String
+  role        Role       @default(BUSINESS_OWNER)
+  business    Business?  @relation(fields: [businessId], references: [id])
+  appointment Appointment[]
+  businessId  String?
   websiteURLs String[]
-  auditLogs  AuditLog[]
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+  auditLogs   AuditLog[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
 }
 
 enum Role {
@@ -104,6 +105,7 @@ model Branch {
   phone      String?
   business   Business @relation(fields: [businessId], references: [id])
   businessId String
+  appointment Appointment[]
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }
@@ -182,18 +184,23 @@ model MenuItem {
 // -------------------------------------------
 // Appointment-based businesses like salons, clinics, gyms etc.
 model Appointment {
-  id            String            @id @default(uuid())
+  id            String             @id @default(uuid())
   customerName  String
   customerPhone String?
   customerEmail String?
   dateTime      DateTime
   service       String
-  status        AppointmentStatus @default(PENDING)
-  business      Business          @relation(fields: [businessId], references: [id])
+  user          User[]              
+  userId        String
+  branch        Branch[]             
+  branchId      String
+  status        AppointmentStatus  @default(PENDING)
+  business      Business           @relation(fields: [businessId], references: [id])
   businessId    String
-  createdAt     DateTime          @default(now())
-  updatedAt     DateTime          @updatedAt
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
 }
+
 
 enum AppointmentStatus {
   PENDING
