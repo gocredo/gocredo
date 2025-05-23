@@ -188,6 +188,8 @@ model Appointment {
   customerEmail String?
   dateTime      DateTime
   service       String
+  user          @relation(fields: [userId], reference:[id])
+  branch        @relation(fields: [branchId], reference:[id])
   status        AppointmentStatus @default(PENDING)
   business      Business          @relation(fields: [businessId], references: [id])
   businessId    String
