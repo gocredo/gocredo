@@ -14,7 +14,17 @@ async function getAllUsers() {
 }
 
 const createUser = asyncWrapper(async (_: any, arg: any,context:any) => {
-
+    return {
+    id: "123",
+    clerkId: context?.clerkUser?.id || "dummy-clerk-id",
+    email: context?.clerkUser?.email || "dummy@example.com",
+    name: `${context?.clerkUser?.firstName ?? "John"} ${context?.clerkUser?.lastName ?? "Doe"}`.trim(),
+    role: arg.role || "BUSINESS_OWNER",
+    businessId: arg.businessId ?? null,
+    websiteURLs: arg.websiteURLs ?? [],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
     const { clerkUser } = context;
     const existingUser = await prisma.user.findUnique({
     where: { clerkId: clerkUser.id },

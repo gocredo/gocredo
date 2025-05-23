@@ -1,0 +1,17 @@
+type BusinessSettings {
+  businessId: ID!
+  currency: String
+  timezone: String
+  logoUrl: String
+  createdAt: String!
+  updatedAt: String!
+}
+
+extend type Mutation{
+    updateBusinessSettings(
+    businessId: ID!
+    currency: String
+    timezone: String
+    logoUrl: String
+  ): BusinessSettings!
+}

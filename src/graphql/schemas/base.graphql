@@ -1,0 +1,78 @@
+
+scalar JSON
+
+enum Role {
+  ADMIN
+  BUSINESS_OWNER
+  CUSTOMER
+}
+ enum BusinessCategory {
+  RESTAURANT
+  SALON
+  BOUTIQUE
+  TIFFIN
+  GYM
+  EVENT_PLANNER
+  COACHING
+  INTERIOR
+  PHOTOGRAPHER
+  REPAIR_SERVICE
+  REAL_ESTATE
+  PET_SERVICE
+  HANDICRAFT
+  FLORIST
+  CLINIC
+  TRAVEL
+  FREELANCER
+  BAKER
+  NGO
+  JEWELLERY
+}
+
+enum PaymentMethod {
+  CASH
+  CREDIT_CARD
+  DEBIT_CARD
+  UPI
+  WALLET
+  BANK_TRANSFER
+  OTHER
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum AppointmentStatus {
+  SCHEDULED
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum OrderType {
+  ONLINE
+  IN_STORE
+  PICKUP
+  DELIVERY
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+  REFUNDED
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELLED
+  EXPIRED
+  PENDING
+}
+type Query
+type Mutation

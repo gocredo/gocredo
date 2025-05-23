@@ -1,0 +1,36 @@
+type Property {
+  id: ID!
+  businessId: ID!
+  title: String!
+  description: String
+  price: Float!
+  location: String!
+  imageUrl: String
+  createdAt: String!
+  updatedAt: String!
+}
+
+extend type Query{
+    property(id: ID!): Property
+}
+
+extend type Mutation{
+    createProperty(
+    businessId: ID!
+    title: String!
+    description: String!
+    price: Float!
+    location: String!
+    imageUrl: String
+  ): Property!
+  updateProperty(
+    id: ID!
+    title: String
+    description: String
+    price: Float
+    location: String
+    imageUrl: String
+  ): Property!
+  deleteProperty(id: ID!): Boolean!
+}
+

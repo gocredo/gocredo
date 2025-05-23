@@ -1,0 +1,51 @@
+type Payment {
+  id: ID!
+  amount: Float!
+  method: PaymentMethod!
+  status: PaymentStatus!
+  initiatedAt: String!
+  verifiedAt: String
+  paidAt: String
+  referenceId: String
+  razorpayOrderId: String
+  razorpayPaymentId: String
+  razorpaySignature: String
+  receiptURL: String
+  customerRole: Role!
+  customerName: String
+  customerEmail: String
+  businessId: ID!
+  createdAt: String!
+  updatedAt: String!
+}
+
+extend type Query{
+    payment(id: ID!): Payment
+}
+
+extend type Mutation{
+    createPayment(
+    amount: Float!
+    method: PaymentMethod!
+    status: PaymentStatus
+    initiatedAt: String!
+    verifiedAt: String
+    paidAt: String
+    referenceId: String
+    razorpayOrderId: String
+    razorpayPaymentId: String
+    razorpaySignature: String
+    receiptURL: String
+    customerRole: Role!
+    customerName: String
+    customerEmail: String
+    businessId: ID!
+  ): Payment!
+  updatePayment(
+    id: ID!
+    status: PaymentStatus
+    verifiedAt: String
+    paidAt: String
+  ): Payment!
+  deletePayment(id: ID!): Boolean!
+}

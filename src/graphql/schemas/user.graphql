@@ -1,0 +1,22 @@
+type User {
+  id: ID!
+  clerkId:String
+  email: String!
+  name: String!
+  role: Role!
+  businessId: ID
+  websiteURLs: [String!]!
+  createdAt: String!
+  updatedAt: String!
+}
+
+extend type Query {
+  users: [User]
+  user(id: ID!): User
+}
+
+extend type Mutation {
+  createUser(role: Role): User!
+  updateUser(id: ID!, name: String, role: Role, businessId: ID): User!
+  deleteUser(id: ID!): Boolean!
+}

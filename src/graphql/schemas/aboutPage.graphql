@@ -1,0 +1,22 @@
+type AboutPage {
+  id: ID!
+  businessId: ID!
+  description: String!
+  mission: String!
+  vision: String!
+  createdAt: String!
+  updatedAt: String!
+}
+
+extend type Query {
+  getAboutPage(businessId: ID!): AboutPage
+}
+
+extend type Mutation {
+  updateAboutPage(
+    businessId: ID!
+    description: String
+    mission: String
+    vision: String
+  ): AboutPage
+}

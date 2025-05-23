@@ -1,0 +1,18 @@
+type Menu {
+  id: ID!
+  businessId: ID!
+  title: String!
+  menuItems: [MenuItem]
+  createdAt: String!
+  updatedAt: String!
+}
+
+extend type Query{
+   menu(id: ID!): Menu
+}
+
+extend type Mutation {
+  createMenu(businessId: ID!, title: String!): Menu!
+  updateMenu(id: ID!, title: String): Menu!
+  deleteMenu(id: ID!): Boolean!
+}

@@ -1,0 +1,30 @@
+type CustomerUser {
+  id: ID!
+  businessId: ID!
+  name: String!
+  email: String
+  phone: String
+  createdAt: String!
+  updatedAt: String!
+}
+
+extend type Query{
+  customers(businessId: ID!): [CustomerUser]
+  customer(id: ID!): CustomerUser
+}
+
+extend type Mutation{
+    createCustomerUser(
+    businessId: ID!
+    name: String!
+    email: String
+    phone: String
+  ): CustomerUser!
+  updateCustomerUser(
+    id: ID!
+    name: String
+    email: String
+    phone: String
+  ): CustomerUser!
+  deleteCustomerUser(id: ID!): Boolean!
+}

@@ -1,0 +1,30 @@
+type Booking {
+  id: ID!
+  businessId: ID!
+  dateTime: String!
+  customerName: String!
+  service: String!
+  createdAt: String!
+  updatedAt: String!
+}
+
+extend type Query{
+    booking(id: ID!): Booking
+}
+
+extend type Mutation{
+    createBooking(
+    businessId: ID!
+    dateTime: String!
+    customerName: String!
+    service: String!
+  ): Booking!
+  updateBooking(
+    id: ID!
+    dateTime: String
+    customerName: String
+    service: String
+  ): Booking!
+  deleteBooking(id: ID!): Boolean!
+
+}

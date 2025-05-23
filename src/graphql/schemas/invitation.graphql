@@ -1,0 +1,17 @@
+type Invitation {
+  id: ID!
+  email: String!
+  role: String!
+  businessId: ID!
+  expiresAt: String!
+  createdAt: String!
+  updatedAt: String!
+}
+extend type Query{
+    invitations(businessId: ID!): [Invitation]
+}
+
+extend type Mutation{
+  createInvitation(email: String!, role: String!, businessId: ID!, expiresAt: String!): Invitation!
+  deleteInvitation(id: ID!): Boolean!
+}

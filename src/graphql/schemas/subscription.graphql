@@ -1,0 +1,22 @@
+type Subscription {
+  id: ID!
+  businessId: ID!
+  plan: Plan!
+  startDate: String!
+  endDate: String
+  lastRenewed: String
+  status: SubscriptionStatus!
+  createdAt: String!
+  updatedAt: String!
+}
+
+extend type Query{
+    subscription(id: ID!): Subscription
+}
+
+extend type Mutation{
+  createSubscription(businessId: ID!, planId: ID!, startDate: String!): Subscription!
+  updateSubscription(id: ID!, status: SubscriptionStatus, endDate: String, lastRenewed: String): Subscription!
+  cancelSubscription(id: ID!): Subscription!
+}
+

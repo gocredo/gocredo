@@ -1,7 +1,7 @@
 import { ApolloServer } from "@apollo/server";
 import { expressMiddleware } from "@apollo/server/express4";
-import { graphQLSchema } from "@/graphql/schema/schema.js";
-import { graphQLResolver } from "@/graphql/resolvers/resolvers.js";
+import { graphQLSchema } from "@/graphql/schema";
+import { graphQLResolver } from "@/graphql/resolvers";
 
 export const connectGraphQL = async () => {
   const server = new ApolloServer({

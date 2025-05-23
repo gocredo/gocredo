@@ -1,0 +1,23 @@
+type Inquiry {
+  id: ID!
+  businessId: ID!
+  name: String!
+  email: String!
+  message: String!
+  createdAt: String!
+  updatedAt: String!
+}
+extend type Query{
+    inquiry(id: ID!): Inquiry
+}
+
+extend type Mutation {
+  createInquiry(
+    businessId: ID!
+    name: String!
+    email: String!
+    message: String!
+  ): Inquiry!
+  updateInquiry(id: ID!, name: String, email: String, message: String): Inquiry!
+  deleteInquiry(id: ID!): Boolean!
+}

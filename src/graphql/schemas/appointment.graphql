@@ -1,0 +1,36 @@
+type Appointment {
+  id: ID!
+  businessId: ID!
+  customerName: String!
+  customerPhone: String
+  customerEmail: String
+  dateTime: String!
+  service: String!
+  status: AppointmentStatus!
+  createdAt: String!
+  updatedAt: String!
+}
+extend type Query{
+    appointment(id: ID!): Appointment
+}
+
+extend type Mutation{
+     createAppointment(
+    businessId: ID!
+    customerName: String!
+    customerPhone: String
+    customerEmail: String
+    dateTime: String!
+    service: String!
+  ): Appointment!
+  updateAppointment(
+    id: ID!
+    customerName: String
+    customerPhone: String
+    customerEmail: String
+    dateTime: String
+    service: String
+    status: AppointmentStatus
+  ): Appointment!
+  deleteAppointment(id: ID!): Boolean!
+}

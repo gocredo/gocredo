@@ -1,0 +1,68 @@
+type Business {
+  id: ID!
+  name: String!
+  category: BusinessCategory!
+  description: String
+  address: String
+  phone: String
+  websiteUrl: String
+  createdAt: String!
+  updatedAt: String!
+  branches: [Branch]
+  menus: [Menu]
+  products: [Product]
+  appointments: [Appointment]
+  bookings: [Booking]
+  reviews: [Review]
+  galleries: [MediaGallery]
+  inquiries: [Inquiry]
+  properties: [Property]
+  donations: [Donation]
+  blogs: [Blog]
+  orders: [Order]
+  payments: [Payment]
+  subscriptions: [Subscription]
+  aboutPage: AboutPage
+  settings: BusinessSettings
+}
+
+extend type Query{
+    businesses: [Business]
+  business(id: ID!): Business
+  businessBranches(businessId: ID!): [Branch]
+  businessMenus(businessId: ID!): [Menu]
+  businessProducts(businessId: ID!): [Product]
+  businessAppointments(businessId: ID!): [Appointment]
+  businessBookings(businessId: ID!): [Booking]
+  businessReviews(businessId: ID!): [Review]
+  businessGalleries(businessId: ID!): [MediaGallery]
+  businessInquiries(businessId: ID!): [Inquiry]
+  businessProperties(businessId: ID!): [Property]
+  businessDonations(businessId: ID!): [Donation]
+  businessBlogs(businessId: ID!): [Blog]
+  businessOrders(businessId: ID!): [Order]
+  businessPayments(businessId: ID!): [Payment]
+  businessSubscriptions(businessId: ID!): [Subscription]
+  businessAboutPage(businessId: ID!): AboutPage
+}
+
+extend type Mutation{
+    createBusiness(
+    name: String!
+    category: BusinessCategory!
+    description: String
+    address: String
+    phone: String
+    websiteUrl: String
+  ): Business!
+  updateBusiness(
+    id: ID!
+    name: String
+    category: BusinessCategory
+    description: String
+    address: String
+    phone: String
+    websiteUrl: String
+  ): Business!
+  deleteBusiness(id: ID!): Boolean!
+}

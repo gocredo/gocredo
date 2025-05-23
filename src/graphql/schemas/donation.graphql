@@ -1,0 +1,29 @@
+type Donation {
+  id: ID!
+  businessId: ID!
+  donorName: String!
+  amount: Float!
+  date: String!
+  createdAt: String!
+  updatedAt: String!
+}
+
+extend type Query{
+    donation(id: ID!): Donation
+}
+
+extend type Mutation {
+  createDonation(
+    businessId: ID!
+    donorName: String!
+    amount: Float!
+    date: String!
+  ): Donation!
+  updateDonation(
+    id: ID!
+    donorName: String
+    amount: Float
+    date: String
+  ): Donation!
+  deleteDonation(id: ID!): Boolean!
+}

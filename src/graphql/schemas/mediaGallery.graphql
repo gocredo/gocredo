@@ -1,0 +1,25 @@
+type MediaGallery {
+  id: ID!
+  businessId: ID!
+  title: String!
+  mediaUrls: [String!]!
+  createdAt: String!
+  updatedAt: String!
+}
+extend type Query{
+    gallery(id: ID!): MediaGallery
+}
+
+extend type Mutation {
+  createMediaGallery(
+    businessId: ID!
+    title: String!
+    mediaUrls: [String!]!
+  ): MediaGallery!
+  updateMediaGallery(
+    id: ID!
+    title: String
+    mediaUrls: [String!]
+  ): MediaGallery!
+  deleteMediaGallery(id: ID!): Boolean!
+}

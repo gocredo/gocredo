@@ -1,4 +1,3 @@
-
 import { ContextType } from "@/utils/contextForResolver";
 export const resolvers = {
   Query:{

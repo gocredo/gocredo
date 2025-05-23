@@ -1,0 +1,20 @@
+type Plan {
+  id: ID!
+  name: String!
+  description: String
+  price: Float!
+  features: [String]
+  createdAt: String!
+  updatedAt: String!
+}
+
+extend type Query{
+    plans: [Plan]
+    plan(id: ID!): Plan
+}
+
+extend type Mutation{
+  createPlan(name: String!, description: String, price: Float!, features: [String!]!): Plan!
+  updatePlan(id: ID!, name: String, description: String, price: Float, features: [String!]): Plan!
+  deletePlan(id: ID!): Boolean!
+}

@@ -1,0 +1,30 @@
+type Order {
+  id: ID!
+  businessId: ID!
+  type: OrderType!
+  items: JSON
+  totalAmount: Float!
+  customerUserId: ID
+  status: OrderStatus!
+  createdAt: String!
+  updatedAt: String!
+}
+
+extend type Query{
+    order(id: ID!): Order
+}
+
+extend type Mutation{
+    createOrder(
+    businessId: ID!
+    type: OrderType!
+    items: JSON!
+    totalAmount: Float!
+    customerUserId: ID
+  ): Order!
+  updateOrder(
+    id: ID!
+    status: OrderStatus
+  ): Order!
+  deleteOrder(id: ID!): Boolean!
+}
