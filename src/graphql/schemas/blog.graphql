@@ -17,6 +17,9 @@ extend type Mutation {
     content: String!
     imageUrl: String
   ): Blog!
-  updateBlog(id: ID!, title: String, content: String, imageUrl: String): Blog!
+  updateBlog(id: ID!, 
+    title: String, 
+    content: String, 
+    imageUrl: String): Blog!
   deleteBlog(id: ID!): Boolean!
 }
