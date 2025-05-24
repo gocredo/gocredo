@@ -17,6 +17,6 @@ extend type Query {
 
 extend type Mutation {
   createUser(role: Role): User!
-  updateUser(id: ID!, name: String, role: Role, businessId: ID): User!
+  updateUser(role: Role, businessId: ID): User!
   deleteUser(id: ID!): Boolean!
 }

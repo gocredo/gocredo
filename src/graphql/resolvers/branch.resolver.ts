@@ -8,7 +8,7 @@ export const branchResolvers = {
     // getBranchById: protectResolver(getBranchById)
   },
   Mutation: {
-    createBranch: protectClerkOnlyResolver(createBranch),
+    createBranch: protectResolver(createBranch),
     updateBranch: protectResolver(branchUpdate),
     deleteBranch: protectResolver(deleteBranch),
   },

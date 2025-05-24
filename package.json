@@ -21,6 +21,7 @@
   "@clerk/backend": "^1.32.2",
   "@clerk/clerk-sdk-node": "github:clerk/clerk-sdk-node",
   "@clerk/express": "^1.4.19",
+  "@graphql-tools/load-files": "^7.0.1",
   "@prisma/client": "^6.7.0",
   "argon2": "^0.43.0",
   "body-parser": "^2.2.0",

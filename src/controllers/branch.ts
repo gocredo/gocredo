@@ -2,22 +2,16 @@ import { asyncWrapper } from "@/utils/asyncHandler";
 import { prisma } from "../lib/prismaClient"
 import { Role } from '../enums/Role';
 
-const getAllBranchesOfBusiness = asyncWrapper(async (arg:{id:string}) => {
-    const {id} = arg;
+const getAllBranchesOfBusiness = asyncWrapper(async (arg: { id: string }) => {
+    const { id } = arg;
     const business = await prisma.business.findUnique({
         where: { id },
+        include:{branches:true}
     });
-    if(!business) {
+    if (!business) {
         throw new Error("Business not found");
     }
-    try {
-        const branches = await prisma.branch.findMany({
-            where: { businessId: id },
-        });
-        return branches;
-    } catch (error) {
-        throw new Error("Error fetching branches");
-    }
+    return business.branches
 });
 
 const createBranch = asyncWrapper(async (_: any, arg: {
@@ -28,24 +22,15 @@ const createBranch = asyncWrapper(async (_: any, arg: {
     pincode: string,
     phone?: string,
     businessId: string
-  }, context: any) => {
-    const {clerkUser} = context;
-    if(!clerkUser) {
-        throw new Error("Unauthorized. Clerk user not found.");
-    }
-    const User = await prisma.user.findUnique({
-        where:{clerkUserId: clerkUser?.id}
-    });
-    if(!User) {
-        throw new Error("User not found");
-    }
-    if(!User.businessId) {
+}, context: any) => {
+    const { user } = context
+    if (!user.businessId) {
         throw new Error("User is not associated with any business");
     }
-    if(User.businessId !== arg.businessId) {
+    if (user.businessId !== arg.businessId) {
         throw new Error("User is not authorized to create branch for this business");
     }
-    const branch=await prisma.branch.create({
+    const branch = await prisma.branch.create({
         data: {
             name: arg.name,
             address: arg.address,
@@ -60,33 +45,25 @@ const createBranch = asyncWrapper(async (_: any, arg: {
 });
 
 type UpdateBranchArgs = {
-    id: string, 
-    name?: string, 
-    address?: string, 
-    city?: string, 
-    state?: string, 
-    pincode?: string, 
-    phone?: string 
+    id: string,
+    name?: string,
+    address?: string,
+    city?: string,
+    state?: string,
+    pincode?: string,
+    phone?: string
 }
 const branchUpdate = asyncWrapper(async (_: any, arg: UpdateBranchArgs, context: any) => {
-    const { clerkUser } = context;
+    const { user } = context;
     const { id, name, address, city, state, pincode, phone } = arg;
-    if (!clerkUser) {
-        throw new Error("Unauthorized. Clerk user not found.");
-    }
-    const User = await prisma.user.findUnique({
-        where: { clerkUserId: clerkUser?.id }
-    });
-    if (!User) {
-        throw new Error("User not found");
-    }
+
     const branch = await prisma.branch.findUnique({
         where: { id }
     });
     if (!branch) {
         throw new Error("Branch not found");
     }
-    if (branch.businessId !== User.businessId) {
+    if (branch.businessId !== user.businessId) {
         throw new Error("User is not authorized to update this branch");
     }
     const updatedBranch = await prisma.branch.update({
@@ -104,24 +81,16 @@ const branchUpdate = asyncWrapper(async (_: any, arg: UpdateBranchArgs, context:
 });
 
 const deleteBranch = asyncWrapper(async (_: any, arg: { id: string }, context: any) => {
-    const { clerkUser } = context;
+    const { user } = context;
     const { id } = arg;
-    if (!clerkUser) {
-        throw new Error("Unauthorized. Clerk user not found.");
-    }
-    const User = await prisma.user.findUnique({
-        where: { clerkUserId: clerkUser?.id }
-    });
-    if (!User) {
-        throw new Error("User not found");
-    }
+    if (!user.businessId) throw new Error("user not associated with any business")
     const branch = await prisma.branch.findUnique({
-        where: { id }
+        where: { id}
     });
     if (!branch) {
         throw new Error("Branch not found");
     }
-    if (branch.businessId !== User.businessId) {
+    if (branch.businessId !== user.businessId) {
         throw new Error("User is not authorized to delete this branch");
     }
     const deletedBranch = await prisma.branch.delete({
@@ -131,8 +100,12 @@ const deleteBranch = asyncWrapper(async (_: any, arg: { id: string }, context: a
 });
 
 const getBranchById = asyncWrapper(async (_: any, arg: { id: string }, context: any) => {
-    const branch=await prisma.branch.findUnique({
-        where: { id: arg.id }
+    const branch = await prisma.branch.findUnique({
+        where: { id: arg.id },
+        include:{
+            appointment:true,
+            business:true
+        }
     });
     if (!branch) {
         throw new Error("Branch not found");

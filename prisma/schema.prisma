@@ -19,7 +19,6 @@ model User {
   name        String
   role        Role       @default(BUSINESS_OWNER)
   business    Business?  @relation(fields: [businessId], references: [id])
-  appointment Appointment[]
   businessId  String?
   websiteURLs String[]
   auditLogs   AuditLog[]
@@ -96,30 +95,31 @@ enum BusinessCategory {
 // -------------------------------------------
 // For businesses with multiple outlets
 model Branch {
-  id         String   @id @default(uuid())
-  name       String
-  address    String
-  city       String
-  state      String
-  pincode    String
-  phone      String?
-  business   Business @relation(fields: [businessId], references: [id])
-  businessId String
+  id          String        @id @default(uuid())
+  name        String
+  address     String
+  city        String
+  state       String
+  pincode     String
+  phone       String?
+  business    Business      @relation(fields: [businessId], references: [id])
+  businessId  String
   appointment Appointment[]
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
 }
 
 model CustomerUser {
-  id         String   @id @default(uuid())
-  name       String
-  email      String?
-  phone      String?
-  business   Business @relation(fields: [businessId], references: [id])
-  businessId String
-  orders     Order[]
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id           String        @id @default(uuid())
+  name         String
+  email        String?
+  phone        String?
+  appointments Appointment[]
+  business     Business      @relation(fields: [businessId], references: [id])
+  businessId   String
+  orders       Order[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
 }
 
 // -------------------------------------------
@@ -184,23 +184,22 @@ model MenuItem {
 // -------------------------------------------
 // Appointment-based businesses like salons, clinics, gyms etc.
 model Appointment {
-  id            String             @id @default(uuid())
-  customerName  String
-  customerPhone String?
-  customerEmail String?
-  dateTime      DateTime
-  service       String
-  user          User[]              
-  userId        String
-  branch        Branch[]             
-  branchId      String
-  status        AppointmentStatus  @default(PENDING)
-  business      Business           @relation(fields: [businessId], references: [id])
-  businessId    String
-  createdAt     DateTime           @default(now())
-  updatedAt     DateTime           @updatedAt
+  id             String            @id @default(uuid())
+  customerUserId String
+  customerUser   CustomerUser      @relation(fields: [customerUserId], references: [id])
+  customerName   String
+  customerPhone  String?
+  customerEmail  String?
+  dateTime       DateTime
+  service        String
+  branch         Branch[]
+  branchId       String
+  status         AppointmentStatus @default(PENDING)
+  business       Business          @relation(fields: [businessId], references: [id])
+  businessId     String
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
 }
-
 
 enum AppointmentStatus {
   PENDING
