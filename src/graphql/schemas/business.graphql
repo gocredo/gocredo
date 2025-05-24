@@ -27,23 +27,10 @@ type Business {
 }
 
 extend type Query{
-    businesses: [Business]
+  businesses: [Business]
   business(id: ID!): Business
-  businessBranches(businessId: ID!): [Branch]
-  businessMenus(businessId: ID!): [Menu]
-  businessProducts(businessId: ID!): [Product]
-  businessAppointments(businessId: ID!): [Appointment]
-  businessBookings(businessId: ID!): [Booking]
-  businessReviews(businessId: ID!): [Review]
-  businessGalleries(businessId: ID!): [MediaGallery]
-  businessInquiries(businessId: ID!): [Inquiry]
-  businessProperties(businessId: ID!): [Property]
-  businessDonations(businessId: ID!): [Donation]
-  businessBlogs(businessId: ID!): [Blog]
-  businessOrders(businessId: ID!): [Order]
-  businessPayments(businessId: ID!): [Payment]
-  businessSubscriptions(businessId: ID!): [Subscription]
-  businessAboutPage(businessId: ID!): AboutPage
+  businessForAdmin(id:ID!):Business
+  
 }
 
 extend type Mutation{

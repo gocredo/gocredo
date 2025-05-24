@@ -22,47 +22,51 @@ const getAllAppointmentsOfBusiness = asyncWrapper(async (arg: { businessId: stri
             businessId: arg.businessId
         },
         include: {
-            user: true,
             branch: true
         }
     });
     return appointments;
 });
+//this will be placed in customerUser controller that will require a separate wrapper 
 
-const getAllAppointmentsOfUser = asyncWrapper(async (arg: { userId: string },context:any) => {
-    const { clerkUser } = context;
-    if (!clerkUser) {
-        throw new Error("Unauthorized. Clerk user not found.");
-    }
-    const user = await prisma.user.findUnique({
-        where: { clerkId: clerkUser.id },
-    });
-    if (!user) {
-        throw new Error("User not found.")
-    }
-    if(user.id !== arg.userId) {
-        throw new Error("Unauthorized. You do not have access to this user.");
-    }
-    const appointments = await prisma.appointment.findMany({
-        where: {
-            userId: arg.userId
-        },
-        include: {
-            business: true,
-            branch: true
-        }
-    });
-    return appointments;
-});
+// const getAllAppointmentsOfUser = asyncWrapper(async (arg: { userId: string },context:any) => {
+//     const { clerkUser } = context;
+//     if (!clerkUser) {
+//         throw new Error("Unauthorized. Clerk user not found.");
+//     }
+//     const user = await prisma.user.findUnique({
+//         where: { clerkId: clerkUser.id },
+//     });
+//     if (!user) {
+//         throw new Error("User not found.")
+//     }
+//     if(user.id !== arg.userId) {
+//         throw new Error("Unauthorized. You do not have access to this user.");
+//     }
+//     const appointments = await prisma.appointment.findMany({
+//         where: {
+//             userId: arg.userId
+//         },
+//         include: {
+//             business: true,
+//             branch: true
+//         }
+//     });
+//     return appointments;
+// });
 
 const getAppointmentById = asyncWrapper(async (arg: { id: string },context:any) => {
-    const appointment = await prisma.appointment.findUnique({
+  const {user}=context
+  if(!user.businessId) throw new Error("user not associated with business")  
+  const appointment = await prisma.appointment.findUnique({
         where: {
             id: arg.id
         },
         include: {
             business: true,
-            branch: true
+            branch: true,
+            customerUser:true
+
         }
     });
     return appointment;
@@ -75,27 +79,27 @@ type CreateAppointmentArgs = {
   dateTime: Date;
   service: string;
   businessId: string;
-  branchId?: string;
+  branchId: string;
 };
 
-const createAppointment = asyncWrapper(async (arg: CreateAppointmentArgs, context: any) => {
-  const { clerkUser } = context;
-  if (!clerkUser) throw new Error("Unauthorized");
+//this will be placed in customerUser controller that will require a separate wrapper 
 
-  const user = await prisma.user.findUnique({ where: { clerkId: clerkUser.id } });
-  if (!user || user.businessId !== arg.businessId) {
-    throw new Error("Unauthorized");
-  }
+// const createAppointment = asyncWrapper(async (arg: CreateAppointmentArgs, context: any) => {
+//   const { user } = context;
+//   if(!user.businessId ) throw new Error("user not associated with business")
+//   if (!user || user.businessId !== arg.businessId) {
+//     throw new Error("Unauthorized");
+//   }
 
-  const newAppointment = await prisma.appointment.create({
-    data: {
-      ...arg,
-      status: "PENDING"
-    }
-  });
+//   const newAppointment = await prisma.appointment.create({
+//     data: {
+//       ...arg,
+//       status: "PENDING"
+//     }
+//   });
 
-  return newAppointment;
-});
+//   return newAppointment;
+// });
 
 type UpdateAppointmentStatusArgs = {
   appointmentId: string;
@@ -103,13 +107,10 @@ type UpdateAppointmentStatusArgs = {
 };
 
 const updateAppointmentStatus = asyncWrapper(async (arg: UpdateAppointmentStatusArgs, context: any) => {
-  const { clerkUser } = context;
-  if (!clerkUser) throw new Error("Unauthorized");
-
+  const {user}=context
   const appointment = await prisma.appointment.findUnique({ where: { id: arg.appointmentId } });
   if (!appointment) throw new Error("Appointment not found");
-
-  const user = await prisma.user.findUnique({ where: { clerkId: clerkUser.id } });
+  
   if (!user || user.businessId !== appointment.businessId) {
     throw new Error("Unauthorized");
   }
@@ -126,26 +127,23 @@ const updateAppointmentStatus = asyncWrapper(async (arg: UpdateAppointmentStatus
 type GetAppointmentsByBranchArgs = {
   branchId: string;
 };
+// include this in branch this can be done from getbybranch in branch controller
 
-const getAppointmentsByBranch = asyncWrapper(async (arg: GetAppointmentsByBranchArgs, context: any) => {
-  const { clerkUser } = context;
-  if (!clerkUser) throw new Error("Unauthorized");
+// const getAppointmentsByBranch = asyncWrapper(async (arg: GetAppointmentsByBranchArgs, context: any) => {
+//   const {user}=context
+//   if(!user.businessId) throw new Error("user not associated with business")
+//   const appointments = await prisma.appointment.findMany({
+//     where: {
+//       branchId: arg.branchId,
+//       businessId:user.businessId
+//     },
+//     include: {
+//       business: true,
+//     }
+//   });
 
-  const user = await prisma.user.findUnique({ where: { clerkId: clerkUser.id } });
-  if (!user) throw new Error("Unauthorized");
-
-  const appointments = await prisma.appointment.findMany({
-    where: {
-      branchId: arg.branchId
-    },
-    include: {
-      business: true,
-      user: true
-    }
-  });
-
-  return appointments;
-});
+//   return appointments;
+// });
 
 
 type DeleteAppointmentArgs = {
@@ -153,17 +151,14 @@ type DeleteAppointmentArgs = {
 };
 
 const deleteAppointment = asyncWrapper(async (arg: DeleteAppointmentArgs, context: any) => {
-  const { clerkUser } = context;
-  if (!clerkUser) throw new Error("Unauthorized");
-
+  const {user}=context
+  if(!user.businessId) throw new Error("user not associated with business")
   const appointment = await prisma.appointment.findUnique({ where: { id: arg.id } });
   if (!appointment) throw new Error("Appointment not found");
-
-  const user = await prisma.user.findUnique({ where: { clerkId: clerkUser.id } });
   if (!user || user.businessId !== appointment.businessId) {
     throw new Error("Unauthorized");
   }
-
+  
   await prisma.appointment.delete({ where: { id: arg.id } });
   return { message: "Appointment deleted successfully" };
 });
@@ -174,10 +169,7 @@ type GetUpcomingAppointmentsArgs = {
 };
 
 const getUpcomingAppointments = asyncWrapper(async (arg: GetUpcomingAppointmentsArgs, context: any) => {
-  const { clerkUser } = context;
-  if (!clerkUser) throw new Error("Unauthorized");
-
-  const user = await prisma.user.findUnique({ where: { clerkId: clerkUser.id } });
+  const {user}=context
   if (!user || user.businessId !== arg.businessId) {
     throw new Error("Unauthorized");
   }
@@ -197,11 +189,8 @@ const getUpcomingAppointments = asyncWrapper(async (arg: GetUpcomingAppointments
 
 export{
     getAllAppointmentsOfBusiness,
-    getAllAppointmentsOfUser,
     getAppointmentById,
-    createAppointment,
     updateAppointmentStatus,
-    getAppointmentsByBranch,
     deleteAppointment,
     getUpcomingAppointments
 }

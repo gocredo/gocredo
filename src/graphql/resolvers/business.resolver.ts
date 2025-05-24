@@ -1,27 +1,23 @@
 import {
-  getAllBusinesses,
   createBusiness,
-  updateBusiness,
   deleteBusiness,
-  usersAllBusinesses,
+  getAllBusinesses,
   getBusinessById,
   getBusinessByIdForAdmin,
-  UsersAssociatedWithBusiness,
+  updateBusiness
 } from '@/controllers/business';
-import { protectClerkOnlyResolver } from '@/middlewares/protectClerkOnlyResolver';
 import { protectResolver } from '@/middlewares/protectResolver';
+import { Role } from '@prisma/client';
 
 export const businessResolvers = {
   Query: {
-    //getAllBusinesses,
-    // getBusinessById,
-    // getBusinessByIdForAdmin: protectResolver(getBusinessByIdForAdmin),
-    // usersAllBusinesses: protectResolver(usersAllBusinesses),
-    // usersAssociatedWithBusiness: protectResolver(UsersAssociatedWithBusiness),
+    business: protectResolver(getBusinessById, { allowedRoles: [Role.ADMIN, Role.BUSINESS_OWNER] }),
+    businesses: protectResolver(getAllBusinesses, { allowedRoles: [Role.ADMIN] }),
+    businessForAdmin: protectResolver(getBusinessByIdForAdmin, { allowedRoles: [Role.ADMIN] }),
   },
   Mutation: {
-    createBusiness: protectClerkOnlyResolver(createBusiness),
-    updateBusiness: protectResolver(updateBusiness),
-    deleteBusiness: protectResolver(deleteBusiness),
+    createBusiness: protectResolver(createBusiness, { allowedRoles: [Role.ADMIN, Role.BUSINESS_OWNER] }),
+    updateBusiness: protectResolver(updateBusiness, { allowedRoles: [Role.ADMIN, Role.BUSINESS_OWNER] }),
+    deleteBusiness: protectResolver(deleteBusiness, { allowedRoles: [Role.ADMIN, Role.BUSINESS_OWNER] }),
   },
 };
