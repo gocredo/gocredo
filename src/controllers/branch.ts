@@ -2,17 +2,18 @@ import { asyncWrapper } from "@/utils/asyncHandler";
 import { prisma } from "../lib/prismaClient"
 import { Role } from '../enums/Role';
 
-const getAllBranchesOfBusiness = asyncWrapper(async (arg: { id: string }) => {
-    const { id } = arg;
-    const business = await prisma.business.findUnique({
-        where: { id },
-        include:{branches:true}
-    });
-    if (!business) {
-        throw new Error("Business not found");
-    }
-    return business.branches
-});
+//can be done from businessById
+// const getAllBranchesOfBusiness = asyncWrapper(async (arg: { id: string }) => {
+//     const { id } = arg;
+//     const business = await prisma.business.findUnique({
+//         where: { id },
+//         include:{branches:true}
+//     });
+//     if (!business) {
+//         throw new Error("Business not found");
+//     }
+//     return business.branches
+// });
 
 const createBranch = asyncWrapper(async (_: any, arg: {
     name: string,
@@ -114,7 +115,6 @@ const getBranchById = asyncWrapper(async (_: any, arg: { id: string }, context: 
 });
 
 export {
-    getAllBranchesOfBusiness,
     createBranch,
     branchUpdate,
     deleteBranch,

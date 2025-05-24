@@ -3,30 +3,31 @@ import { prisma } from "../lib/prismaClient"
 import { Role } from '../enums/Role';
 import { AppointmentStatus } from "@/enums/AppointmentStatus";
 
-const getAllAppointmentsOfBusiness = asyncWrapper(async (arg: { businessId: string },context:any) => {
-    const { clerkUser } = context;
-    if (!clerkUser) {
-        throw new Error("Unauthorized. Clerk user not found.");
-    }
-    const user = await prisma.user.findUnique({
-        where: { clerkId: clerkUser.id },
-    });
-    if (!user) {
-        throw new Error("User not found.")
-    }
-    if(user.businessId !== arg.businessId) {
-        throw new Error("Unauthorized. You do not have access to this business.");
-    }
-    const appointments = await prisma.appointment.findMany({
-        where: {
-            businessId: arg.businessId
-        },
-        include: {
-            branch: true
-        }
-    });
-    return appointments;
-});
+// can be retrieved from business only
+// const getAllAppointmentsOfBusiness = asyncWrapper(async (arg: { businessId: string },context:any) => {
+//     const { clerkUser } = context;
+//     if (!clerkUser) {
+//         throw new Error("Unauthorized. Clerk user not found.");
+//     }
+//     const user = await prisma.user.findUnique({
+//         where: { clerkId: clerkUser.id },
+//     });
+//     if (!user) {
+//         throw new Error("User not found.")
+//     }
+//     if(user.businessId !== arg.businessId) {
+//         throw new Error("Unauthorized. You do not have access to this business.");
+//     }
+//     const appointments = await prisma.appointment.findMany({
+//         where: {
+//             businessId: arg.businessId
+//         },
+//         include: {
+//             branch: true
+//         }
+//     });
+//     return appointments;
+// });
 //this will be placed in customerUser controller that will require a separate wrapper 
 
 // const getAllAppointmentsOfUser = asyncWrapper(async (arg: { userId: string },context:any) => {
@@ -188,7 +189,6 @@ const getUpcomingAppointments = asyncWrapper(async (arg: GetUpcomingAppointments
 });
 
 export{
-    getAllAppointmentsOfBusiness,
     getAppointmentById,
     updateAppointmentStatus,
     deleteAppointment,
