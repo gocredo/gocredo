@@ -21,21 +21,19 @@ const createBusiness = asyncWrapper(async (_: any, arg: {
   phone?: string;
   websiteUrl?: string;
 }, context: any) => {
-  
-    const { clerkUser } = context;
-
-  if (!clerkUser?.id) {
-    throw new Error("Unauthorized. Clerk user not found.");
-  }
-
   const existingUser = await prisma.user.findUnique({
-    where: { clerkId: clerkUser.id },
+    where: { clerkId: context.clerkUser.id },
   });
 
   if (!existingUser) {
     throw new Error("User must be registered before creating a business.");
   }
-
+  if( existingUser.role !== Role.ADMIN && existingUser.role !== Role.BUSINESS_OWNER) {
+    throw new Error("Unauthorized. Only admins and business owners can create businesses.");
+  }
+  if (!Object.values(BusinessCategory).includes(arg.category)) {
+    throw new Error("Invalid business category.");
+  }
   const newBusiness = await prisma.business.create({
     data: {
       name: arg.name,
@@ -68,17 +66,8 @@ type UpdateBusinessArgs = {
 const updateBusiness = asyncWrapper(
   async (_: any, arg: UpdateBusinessArgs, context: any) => {
     const { id, name, category, description, address, phone, websiteUrl } = arg;
-    const { clerkUser } = context;
-    if(!clerkUser?.id) {
-      throw new Error("Unauthorized. Clerk user not found."); 
-    }
-    const user= await prisma.user.findUnique({
-      where: { clerkId: clerkUser.id },
-    });
-    if(!user) {
-      throw new Error("User not found.");
-    }
-    if(user.role !== Role.ADMIN && user.role !== Role.BUSINESS_OWNER) {
+
+    if(context.user.role !== Role.ADMIN && context.user.role !== Role.BUSINESS_OWNER) {
       throw new Error("Unauthorized. Only admins and business owners can update businesses.");
     }
     const dataToUpdate: any = {};
@@ -107,21 +96,12 @@ const updateBusiness = asyncWrapper(
 const deleteBusiness = asyncWrapper(
   async (_: any, arg: { id: string }, context: any) => {
     const { id } = arg;
-    const { clerkUser } = context;
-    if(!clerkUser?.id) {
-      throw new Error("Unauthorized. Clerk user not found."); 
-    }
-    const user= await prisma.user.findUnique({
-      where: { clerkId: clerkUser.id },
-    });
-    if(!user) {
-      throw new Error("User not found.");
-    }
-    if(user.role !== Role.ADMIN && user.role !== Role.BUSINESS_OWNER) {
+
+    if(context.user.role !== Role.ADMIN && context.user.role !== Role.BUSINESS_OWNER) {
       throw new Error("Unauthorized. Only admins and business owners can delete businesses.");
     }
     const deletedBusiness = await prisma.business.delete({
-      where: { id: id },
+      where: { id },
     });
 
     return deletedBusiness;
@@ -130,24 +110,15 @@ const deleteBusiness = asyncWrapper(
 
 const usersAllBusinesses = asyncWrapper(
   async (_: any, arg:any, context: any) => {
-    const {clerkUser} = context;
-    if(!clerkUser?.id) {
-      throw new Error("Unauthorized. Clerk user not found."); 
-    };
-    const user=await prisma.user.findUnique({
-      where: { clerkId: clerkUser.id },
-    });
-    if(!user) {
-      throw new Error("User not found.");
-    }
-    if(user.role !== Role.ADMIN && user.role !== Role.BUSINESS_OWNER) {
+
+    if(context.user.role !== Role.ADMIN && context.user.role !== Role.BUSINESS_OWNER) {
       throw new Error("Unauthorized. Only admins and business owners can view businesses.");
     }
     const businesses = await prisma.business.findMany({
       where: {
         users: {
           some: {
-            id: user.id,
+            id: context.user.id,
           },
         },
       },
@@ -167,17 +138,8 @@ const getBusinessById = asyncWrapper(
   const getBusinessByIdForAdmin = asyncWrapper(
     async (_: any, arg: { id: string }, context: any) => {
       const { id } = arg;
-      const { clerkUser } = context;
-      if(!clerkUser?.id) {
-        throw new Error("Unauthorized. Clerk user not found."); 
-      }
-      const user= await prisma.user.findUnique({
-        where: { clerkId: clerkUser.id },
-      });
-      if(!user) {
-        throw new Error("User not found.");
-      }
-      if(user.role !== Role.ADMIN) {
+      
+      if(context.user.role !== Role.ADMIN) {
         throw new Error("Unauthorized. Only admins can view businesses.");
       }
       const business = await prisma.business.findUnique({
@@ -190,17 +152,8 @@ const getBusinessById = asyncWrapper(
     const UsersAssociatedWithBusiness = asyncWrapper(
       async (_: any, arg: { id: string }, context: any) => {
         const { id } = arg;
-        const { clerkUser } = context;
-        if(!clerkUser?.id) {
-          throw new Error("Unauthorized. Clerk user not found."); 
-        }
-        const user= await prisma.user.findUnique({
-          where: { clerkId: clerkUser.id },
-        });
-        if(!user) {
-          throw new Error("User not found.");
-        }
-        if(user.role !== Role.ADMIN && user.role !== Role.BUSINESS_OWNER) {
+
+        if(context.user.role !== Role.ADMIN && context.user.role !== Role.BUSINESS_OWNER) {
           throw new Error("Unauthorized. Only admins and business owners can view businesses.");
         }
         const business = await prisma.business.findUnique({
