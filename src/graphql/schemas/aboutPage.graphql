@@ -13,10 +13,19 @@ extend type Query {
 }
 
 extend type Mutation {
+  createAboutPage(
+    businessId: ID!
+    description: String
+    mission: String
+    vision: String
+  ): AboutPage
+
   updateAboutPage(
     businessId: ID!
     description: String
     mission: String
     vision: String
   ): AboutPage
+
+  deleteAboutPage(Id: ID!): Boolean
 }

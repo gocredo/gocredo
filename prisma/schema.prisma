@@ -58,7 +58,7 @@ model Business {
   payments     Payment[] // Online transactions and tracking
   customers    CustomerUser[]
   orders       Order[]
-  about        AboutPage?
+  about        AboutPage?  
   auditLogs    AuditLog[]
   invitations  Invitation[]
 

@@ -1,4 +1,5 @@
 import {
+  businessForPublic,
   createBusiness,
   deleteBusiness,
   getAllBusinesses,
@@ -14,6 +15,7 @@ export const businessResolvers = {
     business: protectResolver(getBusinessById, { allowedRoles: [Role.ADMIN, Role.BUSINESS_OWNER] }),
     businesses: protectResolver(getAllBusinesses, { allowedRoles: [Role.ADMIN] }),
     businessForAdmin: protectResolver(getBusinessByIdForAdmin, { allowedRoles: [Role.ADMIN] }),
+    businessForPublic:businessForPublic,
   },
   Mutation: {
     createBusiness: protectResolver(createBusiness, { allowedRoles: [Role.ADMIN, Role.BUSINESS_OWNER] }),

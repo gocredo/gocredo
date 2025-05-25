@@ -131,27 +131,28 @@ const getBusinessById = asyncWrapper(
     const business = await prisma.business.findUnique({
       where: { id },
       include: {
-      users: true,
-      menus: true,
-      appointments: true,
-      products: true,
-      reviews: true,
-      bookings: true,
-      galleries: true,
-      inquiries: true,
-      properties: true,
-      donations: true,
-      blogs: true,
-      branches: true,
-      payments: true,
-      customers: true,
-      orders: true,
-      about: true,
-      auditLogs: true,
-      invitations: true,
-      businessSetting: true,
-      Subscription: true,
-    }});
+        users: true,
+        menus: true,
+        appointments: true,
+        products: true,
+        reviews: true,
+        bookings: true,
+        galleries: true,
+        inquiries: true,
+        properties: true,
+        donations: true,
+        blogs: true,
+        branches: true,
+        payments: true,
+        customers: true,
+        orders: true,
+        about: true,
+        auditLogs: true,
+        invitations: true,
+        businessSetting: true,
+        Subscription: true,
+      }
+    });
     return business;
   });
 
@@ -165,10 +166,10 @@ const getBusinessByIdForAdmin = asyncWrapper(
     return business;
   });
 
-  const getAllBusinesses = asyncWrapper(
+const getAllBusinesses = asyncWrapper(
   async (_: any, arg: { id: string }, context: any) => {
     const businessess = await prisma.business.findMany()
-  return businessess;
+    return businessess;
   });
 
 const UsersAssociatedWithBusiness = asyncWrapper(
@@ -176,7 +177,7 @@ const UsersAssociatedWithBusiness = asyncWrapper(
     const { id } = arg;
     const business = await prisma.business.findUnique({
       where: { id },
-      include:{users:true}
+      include: { users: true }
     });
     if (!business) {
       throw new Error("Business not found.");
@@ -184,6 +185,11 @@ const UsersAssociatedWithBusiness = asyncWrapper(
     return business.users;
   }
 );
+
+const businessForPublic = asyncWrapper(async (_: any, arg: { id: string }) => {
+  const business = await prisma.business.findUnique({ where: { id: arg.id }, include: { reviews: true, galleries: true, about: true, branches: true, products: true } });
+  return business;
+})
 
 export {
   getAllBusinesses,
@@ -193,5 +199,6 @@ export {
   usersAllBusinesses,
   getBusinessById,
   getBusinessByIdForAdmin,
+  businessForPublic,
   UsersAssociatedWithBusiness
 }
