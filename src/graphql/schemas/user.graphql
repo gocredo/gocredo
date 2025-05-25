@@ -5,6 +5,7 @@ type User {
   name: String!
   role: Role!
   businessId: ID
+  business:Business
   websiteURLs: [String!]!
   createdAt: String!
   updatedAt: String!

@@ -1,13 +1,15 @@
 import { asyncWrapper } from "@/utils/asyncHandler";
 import { prisma } from "@/lib/prismaClient"
+import graphqlFields from "graphql-fields";
+import { buildPrismaQuery } from "@/helpers/prismaQuerybuilder";
 
-const getAboutPage = asyncWrapper(async (_: unknown, args: { businessId: string }, context: any) => {
+const getAboutPage = asyncWrapper(async (_: unknown, args: { businessId: string }, context: any,info:any) => {
     const { businessId } = args;
+    const requestedFields = graphqlFields(info);
+    const prismaQuerybuilder = await buildPrismaQuery(requestedFields);
     return await prisma.aboutPage.findUnique({
         where: { businessId },
-        include: {
-            business: true
-        }
+        include:prismaQuerybuilder
     });
 })
 

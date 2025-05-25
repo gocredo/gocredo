@@ -22,7 +22,7 @@ type Business {
   orders: [Order]
   payments: [Payment]
   subscriptions: [Subscription]
-  aboutPage: AboutPage
+  about: AboutPage
   settings: BusinessSettings
 }
 
@@ -39,6 +39,7 @@ type BusinessPublicDetails{
   products: [Product]
   about: AboutPage
   branches: [Branch]
+  reviews: [Review]
 }
 
 extend type Query{

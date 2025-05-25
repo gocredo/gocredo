@@ -1,6 +1,7 @@
 type AboutPage {
   id: ID!
   businessId: ID!
+  business: Business
   description: String!
   mission: String!
   vision: String!
