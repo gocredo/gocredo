@@ -11,7 +11,7 @@ export const customerResolvers = {
   },
   Mutation: {
     createCustomerUser:protectClerkOnlyResolver(registerUser),
-    updateCustomerProfile: protectCustomerResolver(updateProfile),
-    deleteCustomerProfile: protectCustomerResolver(deleteProfile),
+    updateCustomerUser: protectCustomerResolver(updateProfile),
+    deleteCustomerUser: protectCustomerResolver(deleteProfile),
   },
 }

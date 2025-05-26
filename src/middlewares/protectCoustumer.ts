@@ -19,9 +19,11 @@ export function protectCustomerResolver(resolver: ResolverFn) {
     }
 
     // Query your DB for your user record by Clerk user ID
-    const userInDb = await prisma.user.findUnique({
-      where: { clerkId: clerkUser.id },
-    });
+    const userInDb = await prisma.customerUser.findUnique({
+      where:{
+        clerkId:clerkUser.id
+      },
+    })
 
     if (!userInDb) {
       throw new Error('User not registered in backend');

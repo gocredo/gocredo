@@ -111,6 +111,7 @@ model Branch {
 
 model CustomerUser {
   id           String        @id @default(uuid())
+  clerkId      String        @unique
   name         String
   email        String?
   phone        String?
