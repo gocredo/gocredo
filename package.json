@@ -4,14 +4,15 @@
  "description": "",
  "main": "dist/app.js",
  "scripts": {
-  "start": "set NODE_ENV=PRODUCTION & node dist/app.js",
+  "start": "cross-env NODE_ENV=production node dist/app.js",
   "build": "npm run lint && tsc -p . && tsc-alias",
   "dev": "tsx watch src/app.ts",
   "lint": "eslint src",
   "lint:fix": "eslint src --fix",
   "prisma:generate": "prisma generate",
-  "prisma:migrate": "prisma migrate dev"
- },
+  "prisma:migrate": "prisma migrate dev",
+  "postinstall": "prisma generate"
+},
  "keywords": [],
  "author": "",
  "type": "module",
