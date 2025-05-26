@@ -97,27 +97,18 @@ const deleteBusiness = asyncWrapper(
     return deletedBusiness;
   }
 );
-
+// required only when the a user has multiple businesses
 const usersAllBusinesses = asyncWrapper(
-  async (_: any, arg: any, context: any) => {
-    const { clerkUser } = context;
-    if (!clerkUser?.id) {
-      throw new Error("Unauthorized. Clerk user not found.");
-    };
-    const user = await prisma.user.findUnique({
-      where: { clerkId: clerkUser.id },
-    });
-    if (!user) {
-      throw new Error("User not found.");
-    }
-    if (user.role !== Role.ADMIN && user.role !== Role.BUSINESS_OWNER) {
+  async (_: any, arg:{userId:string}, context: any) => {// userid if admin requesting
+    if (context.user.role !== Role.ADMIN && context.user.role !== Role.BUSINESS_OWNER) {
       throw new Error("Unauthorized. Only admins and business owners can view businesses.");
     }
+    const TargetUserId=(context.user.role === Role.ADMIN && arg.userId) ? arg.userId : context.user.id;
     const businesses = await prisma.business.findMany({
       where: {
         users: {
           some: {
-            id: context.user.id,
+            id: TargetUserId,
           },
         },
       },
@@ -155,23 +146,14 @@ const getBusinessById = asyncWrapper(
     return business;
   });
 
-const getBusinessByIdForAdmin = asyncWrapper(
-  async (_: any, arg: { id: string }, context: any) => {
-    const { id } = arg;
-    const business = await prisma.business.findUnique({
-      where: { id },
-    });
-
-    return business;
-  });
-
   const getAllBusinesses = asyncWrapper(
   async (_: any, arg: { id: string }, context: any) => {
     const businessess = await prisma.business.findMany()
   return businessess;
   });
 
-const UsersAssociatedWithBusiness = asyncWrapper(
+// can be removed as we can get users from getBusinessById directly
+  const UsersAssociatedWithBusiness = asyncWrapper(
   async (_: any, arg: { id: string }, context: any) => {
     const { id } = arg;
     const business = await prisma.business.findUnique({
@@ -192,6 +174,5 @@ export {
   deleteBusiness,
   usersAllBusinesses,
   getBusinessById,
-  getBusinessByIdForAdmin,
   UsersAssociatedWithBusiness
 }

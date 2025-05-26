@@ -67,7 +67,6 @@ const getAppointmentById = asyncWrapper(async (arg: { id: string },context:any) 
             business: true,
             branch: true,
             customerUser:true
-
         }
     });
     return appointment;
