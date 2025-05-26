@@ -17,8 +17,8 @@ extend type Mutation{
     createCustomerUser(
     businessId: ID!
     name: String!
-    email: String
-    phone: String
+    email: String!
+    phone: String!
   ): CustomerUser!
   updateCustomerUser(
     id: ID!

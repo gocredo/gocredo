@@ -22,14 +22,33 @@ type Business {
   orders: [Order]
   payments: [Payment]
   subscriptions: [Subscription]
-  aboutPage: AboutPage
+  about: AboutPage
   settings: BusinessSettings
+}
+
+type BusinessPublicDetails{
+  id:ID!
+  name:String
+  category: BusinessCategory!
+  description: String
+  address: String
+  phone: String
+  websiteUrl: String
+  createdAt: String!
+  updatedAt: String!
+  products: [Product]
+  about: AboutPage
+  branches: [Branch]
+  reviews: [Review]
 }
 
 extend type Query{
   businesses: [Business]
   business(id: ID!): Business
   businessForAdmin(id:ID!):Business
+  businessForPublic(id:ID!):BusinessPublicDetails
+  reviews: [Review]
+  galleries: [MediaGallery]
   
 }
 

@@ -2,6 +2,8 @@ import { asyncWrapper } from "@/utils/asyncHandler";
 import { prisma } from "../lib/prismaClient"
 import { Role } from '../enums/Role';
 import { AppointmentStatus } from "@/enums/AppointmentStatus";
+import graphqlFields from "graphql-fields";
+import { buildPrismaQuery } from "@/helpers/prismaQuerybuilder";
 
 // can be retrieved from business only
 // const getAllAppointmentsOfBusiness = asyncWrapper(async (arg: { businessId: string },context:any) => {
@@ -56,20 +58,18 @@ import { AppointmentStatus } from "@/enums/AppointmentStatus";
 //     return appointments;
 // });
 
-const getAppointmentById = asyncWrapper(async (arg: { id: string },context:any) => {
-  const {user}=context
-  if(!user.businessId) throw new Error("user not associated with business")  
+const getAppointmentById = asyncWrapper(async (arg: { id: string }, context: any, info: any) => {
+  const { user } = context
+  if (!user.businessId) throw new Error("user not associated with business")
+  const requestedFields = graphqlFields(info);
+  const prismaQuerybuilder = await buildPrismaQuery(requestedFields);
   const appointment = await prisma.appointment.findUnique({
-        where: {
-            id: arg.id
-        },
-        include: {
-            business: true,
-            branch: true,
-            customerUser:true
-        }
-    });
-    return appointment;
+    where: {
+      id: arg.id
+    },
+    include: prismaQuerybuilder
+  });
+  return appointment;
 });
 
 type CreateAppointmentArgs = {
@@ -107,10 +107,10 @@ type UpdateAppointmentStatusArgs = {
 };
 
 const updateAppointmentStatus = asyncWrapper(async (arg: UpdateAppointmentStatusArgs, context: any) => {
-  const {user}=context
+  const { user } = context
   const appointment = await prisma.appointment.findUnique({ where: { id: arg.appointmentId } });
   if (!appointment) throw new Error("Appointment not found");
-  
+
   if (!user || user.businessId !== appointment.businessId) {
     throw new Error("Unauthorized");
   }
@@ -151,14 +151,14 @@ type DeleteAppointmentArgs = {
 };
 
 const deleteAppointment = asyncWrapper(async (arg: DeleteAppointmentArgs, context: any) => {
-  const {user}=context
-  if(!user.businessId) throw new Error("user not associated with business")
+  const { user } = context
+  if (!user.businessId) throw new Error("user not associated with business")
   const appointment = await prisma.appointment.findUnique({ where: { id: arg.id } });
   if (!appointment) throw new Error("Appointment not found");
   if (!user || user.businessId !== appointment.businessId) {
     throw new Error("Unauthorized");
   }
-  
+
   await prisma.appointment.delete({ where: { id: arg.id } });
   return { message: "Appointment deleted successfully" };
 });
@@ -169,7 +169,7 @@ type GetUpcomingAppointmentsArgs = {
 };
 
 const getUpcomingAppointments = asyncWrapper(async (arg: GetUpcomingAppointmentsArgs, context: any) => {
-  const {user}=context
+  const { user } = context
   if (!user || user.businessId !== arg.businessId) {
     throw new Error("Unauthorized");
   }
@@ -187,11 +187,11 @@ const getUpcomingAppointments = asyncWrapper(async (arg: GetUpcomingAppointments
   return appointments;
 });
 
-export{
-    getAppointmentById,
-    updateAppointmentStatus,
-    deleteAppointment,
-    getUpcomingAppointments
+export {
+  getAppointmentById,
+  updateAppointmentStatus,
+  deleteAppointment,
+  getUpcomingAppointments
 }
 
 

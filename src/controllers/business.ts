@@ -2,6 +2,8 @@ import { asyncWrapper } from "@/utils/asyncHandler";
 import { prisma } from "../lib/prismaClient"
 import { Role } from '../enums/Role';
 import { BusinessCategory } from "@/enums/BusinessCategory";
+import graphqlFields from 'graphql-fields';
+import { buildPrismaQuery } from "@/helpers/prismaQuerybuilder";
 
 const createBusiness = asyncWrapper(async (_: any, arg: {
   name: string;
@@ -117,39 +119,30 @@ const usersAllBusinesses = asyncWrapper(
   });
 
 const getBusinessById = asyncWrapper(
-  async (_: any, arg: { id: string }) => {
+  async (_: any, arg: { id: string }, context: any, info: any) => {
     const { id } = arg;
+    const requestedFields = graphqlFields(info);
+    const prismaQuerybuilder = await buildPrismaQuery(requestedFields);
     const business = await prisma.business.findUnique({
       where: { id },
-      include: {
-      users: true,
-      menus: true,
-      appointments: true,
-      products: true,
-      reviews: true,
-      bookings: true,
-      galleries: true,
-      inquiries: true,
-      properties: true,
-      donations: true,
-      blogs: true,
-      branches: true,
-      payments: true,
-      customers: true,
-      orders: true,
-      about: true,
-      auditLogs: true,
-      invitations: true,
-      businessSetting: true,
-      Subscription: true,
-    }});
+      include: prismaQuerybuilder
+    });
     return business;
   });
 
-  const getAllBusinesses = asyncWrapper(
+const getBusinessByIdForAdmin = asyncWrapper(
+  async (_: any, arg: { id: string }, context: any) => {
+    const { id } = arg;
+    const business = await prisma.business.findUnique({
+      where: { id },
+    });
+    return business;
+  });
+
+const getAllBusinesses = asyncWrapper(
   async (_: any, arg: { id: string }, context: any) => {
     const businessess = await prisma.business.findMany()
-  return businessess;
+    return businessess;
   });
 
 // can be removed as we can get users from getBusinessById directly
@@ -158,7 +151,7 @@ const getBusinessById = asyncWrapper(
     const { id } = arg;
     const business = await prisma.business.findUnique({
       where: { id },
-      include:{users:true}
+      include: { users: true }
     });
     if (!business) {
       throw new Error("Business not found.");
@@ -167,6 +160,14 @@ const getBusinessById = asyncWrapper(
   }
 );
 
+const businessForPublic = asyncWrapper(async (_: any, arg: { id: string }, context: any, info: any) => {
+  const requestedFields = graphqlFields(info);
+  const prismaQuerybuilder = await buildPrismaQuery(requestedFields);
+
+  const business = await prisma.business.findUnique({ where: { id: arg.id }, include: prismaQuerybuilder });
+  return business;
+})
+
 export {
   getAllBusinesses,
   createBusiness,
@@ -174,5 +175,7 @@ export {
   deleteBusiness,
   usersAllBusinesses,
   getBusinessById,
+  getBusinessByIdForAdmin,
+  businessForPublic,
   UsersAssociatedWithBusiness
 }

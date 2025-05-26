@@ -1,4 +1,5 @@
 import {
+  businessForPublic,
   createBusiness,
   deleteBusiness,
   getAllBusinesses,
@@ -7,13 +8,14 @@ import {
   updateBusiness
 } from '@/controllers/business';
 import { protectResolver } from '@/middlewares/protectResolver';
-import { Role } from '@prisma/client';
+import { Role } from '@/enums/Role';
 
 export const businessResolvers = {
   Query: {
     business: protectResolver(getBusinessById, { allowedRoles: [Role.ADMIN, Role.BUSINESS_OWNER] }),
     businesses: protectResolver(getAllBusinesses, { allowedRoles: [Role.ADMIN] }),
     businessForAdmin: protectResolver(getBusinessByIdForAdmin, { allowedRoles: [Role.ADMIN] }),
+    businessForPublic:businessForPublic,
   },
   Mutation: {
     createBusiness: protectResolver(createBusiness, { allowedRoles: [Role.ADMIN, Role.BUSINESS_OWNER] }),

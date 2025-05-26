@@ -1,5 +1,5 @@
 import { getAuth, clerkClient } from '@clerk/express';
-import { Role } from "@prisma/client";
+import { Role } from "../enums/Role";
 import { prisma } from "../lib/prismaClient"
 type ResolverFn = (parent: any, args: any, context: any, info: any) => Promise<any>;
 
