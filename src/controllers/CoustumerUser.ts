@@ -1,5 +1,9 @@
 import { asyncWrapper } from "@/utils/asyncHandler";
 import { prisma } from "../lib/prismaClient"
+import graphqlFields from 'graphql-fields';
+import { buildPrismaQuery } from "@/helpers/prismaQuerybuilder";
+
+//fetching all coustumers will be done in the business controller only 
 
 type registerUserArgs = {
     name:string;
@@ -31,9 +35,12 @@ const registerUser = asyncWrapper(async(_:any,args:registerUserArgs,context:any)
     return newUser;
 });
 
-const getMyProfile = asyncWrapper(async(_:any,args:any,context:any) => {
+const getMyProfile = asyncWrapper(async(_:any,args:any,context:any,info:any) => {
+    const requestedFields = graphqlFields(info);
+    const prismaQuerybuilder = await buildPrismaQuery(requestedFields);
     const User=await prisma.CustomerUser.findUnique({
       where: { clerkId: context.user.clerkId },
+      include:prismaQuerybuilder,
     });
     return User;
 });
