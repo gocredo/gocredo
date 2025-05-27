@@ -12,7 +12,7 @@
   "prisma:generate": "prisma generate",
   "prisma:migrate": "prisma migrate dev",
   "postinstall": "prisma generate"
-},
+ },
  "keywords": [],
  "author": "",
  "type": "module",
@@ -24,6 +24,7 @@
   "@clerk/express": "^1.4.19",
   "@graphql-tools/load-files": "^7.0.1",
   "@prisma/client": "^6.7.0",
+  "@upstash/redis": "^1.34.9",
   "argon2": "^0.43.0",
   "body-parser": "^2.2.0",
   "cors": "2.8.5",
@@ -36,7 +37,8 @@
   "graphql-tools": "^9.0.18",
   "helmet": "8.1.0",
   "morgan": "1.10.0",
-  "prisma": "^6.7.0"
+  "prisma": "^6.7.0",
+  "redis": "^5.1.0"
  },
  "devDependencies": {
   "@eslint/js": "9.26.0",
