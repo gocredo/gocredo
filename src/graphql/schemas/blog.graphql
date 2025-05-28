@@ -1,25 +1,29 @@
 type Blog {
   id: ID!
-  businessId: ID!
+  businessId: String!
   title: String!
   content: String!
   imageUrl: String
   createdAt: String!
   updatedAt: String!
 }
+
 extend type Query {
   blog(id: ID!): Blog
 }
+
 extend type Mutation {
   createBlog(
-    businessId: ID!
+    businessId: String!
     title: String!
     content: String!
     imageUrl: String
   ): Blog!
-  updateBlog(id: ID!, 
-    title: String, 
-    content: String, 
-    imageUrl: String): Blog!
+  updateBlog(
+    id: ID!
+    title: String
+    content: String
+    imageUrl: String
+  ): Blog!
   deleteBlog(id: ID!): Boolean!
 }
