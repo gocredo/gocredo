@@ -16,7 +16,7 @@ model User {
   websiteURLs String[]
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
-  clerkId     String     @unique
+  clerkId     String     @unique  
   auditLogs   AuditLog[]
   business    Business?  @relation(fields: [businessId], references: [id])
 }
