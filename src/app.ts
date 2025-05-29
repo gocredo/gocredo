@@ -11,7 +11,7 @@ import bodyParser from "body-parser";
 import rateLimit from 'express-rate-limit';
 
 import { clerkMiddleware } from "@clerk/express";
-import { startKeepAlivePing } from "./helpers/keepServerAlive";
+import { startKeepAlivePing } from "./helpers/keepServerAlive.js";
   
 dotenv.config({path: './.env',});
   
