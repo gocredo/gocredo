@@ -1,5 +1,5 @@
 export async function buildPrismaQuery(fields: any) {
-  let include: any = {};
+  const include: any = {};
   let hasNested = false;
 
   for (const key in fields) {

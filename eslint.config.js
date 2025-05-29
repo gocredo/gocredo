@@ -2,9 +2,8 @@
 import js from "@eslint/js";
 import tseslint from "typescript-eslint";
 import globals from "globals";
-import { FlatConfig } from "eslint/config"; // optional, no need to declare @type manually
 
-const config = [
+export default [
   {
     ignores: ["**/node_modules/**", "dist/**"],
   },
@@ -29,5 +28,3 @@ const config = [
     },
   },
 ];
-
-export default config;
