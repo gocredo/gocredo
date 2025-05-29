@@ -1,6 +1,6 @@
 import express from "express"
 import helmet from "helmet"
-import { connectGraphQL } from "@/graphql/graphql"
+import { connectGraphQL } from "@/graphql/graphql.js"
 import { expressMiddleware } from "@apollo/server/express4";
 import cors from 'cors'
 import { errorMiddleware } from "@/middlewares/error.js"
