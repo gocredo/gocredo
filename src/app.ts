@@ -11,6 +11,7 @@ import bodyParser from "body-parser";
 import rateLimit from 'express-rate-limit';
 
 import { clerkMiddleware } from "@clerk/express";
+import { startKeepAlivePing } from "./helpers/keepServerAlive";
   
 dotenv.config({path: './.env',});
   
@@ -51,7 +52,7 @@ app.use("/graphql", bodyParser.json(), graphqlMiddleware);
 
 
 app.use(morgan('dev'))
-    
+startKeepAlivePing(process.env.SELF_URL);    
   
   // app.get('/', (req, res) => {
   //    res.send('Hello, World!');
