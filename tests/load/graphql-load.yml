@@ -1,0 +1,22 @@
+config:
+  target: "http://localhost:4000" 
+  phases:
+    - duration: 10       # run for 10 seconds
+      arrivalRate: 100   # 100 new users per second
+  payload:
+    path: "./queries.csv"
+    fields:
+      - query
+  defaults:
+    headers:
+      content-type: "application/json"
+      authorization: "Bearer {{ token }}"
+scenarios:
+  - name: "GraphQL query test"
+    flow:
+      - post:
+          url: "/graphql"
+          json:
+            query: "{{ query }}"
+          
+            
