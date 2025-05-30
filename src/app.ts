@@ -1,3 +1,5 @@
+import http from "http";
+import { setupGracefulShutdown } from "@/utils/gracefulShutdown.js";
 import express from "express"
 import helmet from "helmet"
 import { connectGraphQL } from "@/graphql/graphql.js"
@@ -68,7 +70,11 @@ startKeepAlivePing(process.env.SELF_URL);
   //   });
   // });
   
-  app.use(errorMiddleware);
-    
-  app.listen(port, () => console.log('Server is working on Port:'+port+' in '+envMode+' Mode.'));
+app.use(errorMiddleware);
+const server = http.createServer(app);
+server.listen(port, () => {
+  console.log(`Server is working on Port: ${port} in ${envMode} Mode.`);
+});
+
+setupGracefulShutdown(server);
   
