@@ -49,12 +49,12 @@ app.use(
 
 const graphqlMiddleware = await connectGraphQL();
 app.use("/graphql", bodyParser.json(), graphqlMiddleware);
-
+app.use("/health",(req,res)=>res.status(200).json({message:"Server running"}))
 
 
 
 app.use(morgan('dev'))
-startKeepAlivePing(process.env.SELF_URL);    
+startKeepAlivePing(`${process.env.SELF_UR}/health`);    
   
   // app.get('/', (req, res) => {
   //    res.send('Hello, World!');
