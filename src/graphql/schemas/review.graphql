@@ -1,7 +1,7 @@
 type Review {
   id: ID!
   businessId: ID!
-  customer: String!
+  customerUserId: String!
   rating: Int
   comment: String
   createdAt: String!
@@ -10,12 +10,13 @@ type Review {
 
 extend type Query{
     review(id: ID!): Review
+    reviews(businessId: ID!): [Review!]!
 }
 
 extend type Mutation {
   createReview(
     businessId: ID!
-    customer: String!
+    customerUserId: String!
     rating: Int!
     comment: String
   ): Review!

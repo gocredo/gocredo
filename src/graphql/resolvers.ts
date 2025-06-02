@@ -5,6 +5,7 @@ import { branchResolvers } from './resolvers/branch.resolver';
 import { aboutPageResolver } from './resolvers/aboutPage.resolver';
 import { customerResolvers } from './resolvers/Coustumer.resolvers';
 import { blogResolvers } from './resolvers/blog.resolver';
+import { reviewResolvers } from './resolvers/review.resolvers';
 
 export const graphQLResolver = mergeResolvers([
   userResolvers,
@@ -13,5 +14,5 @@ export const graphQLResolver = mergeResolvers([
   aboutPageResolver,
   customerResolvers,
   blogResolvers,
-
+  reviewResolvers,
 ]);

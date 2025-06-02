@@ -24,10 +24,10 @@ const registerUser = asyncWrapper(async(_:any,args:registerUserArgs,context:any)
     const newUser = await prisma.customerUser.create({
         data: {
             clerkId:clerkUser.id,
-            name: `${clerkUser.fullName}`.trim(),
-            email: clerkUser.email,
-            phone,
-            businessId
+            name: name,
+            email: email,
+            phone: phone,
+            businessId: businessId
         },
     });
     return newUser;
@@ -67,12 +67,25 @@ const deleteProfile = asyncWrapper(async(_:any,args:any,context:any) => {
     const deletedUser = await prisma.customerUser.delete({
         where: { id:context.user.id },
     });
-    return deletedUser;
+    if(deletedUser){
+        return true;
+    }
+    return false;
+});
+ const getAllCustomerUsers = asyncWrapper(async(_:any,args:{businessId:string},context:any,info:any) => {
+    const requestedFields = graphqlFields(info);
+    const prismaQuerybuilder = await buildPrismaQuery(requestedFields);
+    const Users=await prisma.customerUser.findMany({
+      where: { businessId: args.businessId },
+      include:prismaQuerybuilder,
+    });
+    return Users;
 });
 
 export{
     registerUser,
     getMyProfile,
     updateProfile,
-    deleteProfile
+    deleteProfile,
+    getAllCustomerUsers
 }

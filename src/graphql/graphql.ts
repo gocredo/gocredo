@@ -7,6 +7,7 @@ export const connectGraphQL = async () => {
   const server = new ApolloServer({
     typeDefs: graphQLSchema,
     resolvers: graphQLResolver,
+    introspection: true, // Enable introspection for development
   });
 
   await server.start();

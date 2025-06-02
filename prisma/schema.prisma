@@ -81,6 +81,7 @@ model CustomerUser {
   appointments Appointment[]
   business     Business      @relation(fields: [businessId], references: [id])
   orders       Order[]
+  reviews      Review[]
 }
 
 model Payment {
@@ -155,13 +156,17 @@ model Product {
 }
 
 model Review {
-  id         String   @id @default(uuid())
-  customer   String
-  rating     Int
-  comment    String?
-  businessId String
-  business   Business @relation(fields: [businessId], references: [id])
+  id              String        @id @default(uuid())
+  rating          Int
+  comment         String?
+  businessId      String
+  customerUserId  String
+  createdAt       DateTime      @default(now())
+
+  business        Business      @relation(fields: [businessId], references: [id])
+  customerUser    CustomerUser  @relation(fields: [customerUserId], references: [id])
 }
+
 
 model Booking {
   id           String   @id @default(uuid())

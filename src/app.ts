@@ -72,8 +72,8 @@ startKeepAlivePing(process.env.SELF_URL);
   
 app.use(errorMiddleware);
 const server = http.createServer(app);
-server.listen(port, () => {
-  console.log(`Server is working on Port: ${port} in ${envMode} Mode.`);
+server.listen(process.env.PORT, () => {
+  console.log(`Server is working on Port: ${process.env.PORT} in ${envMode} Mode.`);
 });
 
 setupGracefulShutdown(server);
