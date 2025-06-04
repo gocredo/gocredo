@@ -5,20 +5,20 @@ import { buildPrismaQuery } from "@/helpers/prismaQuerybuilder";
 import { withCache } from "@/utils/withCache";
 import { withCacheInvalidation } from "@/utils/withCache";
 
-const reviewCacheKeyBuilder = (_: any, __: any, context: any) => {
-  return [`reviews:user:${context.user.id}:*`]; // Invalidate all queries related to this user's reviews
+const reviewCacheKeyBuilder = (_: any, args:any, context: any) => {
+  return [`review:id:${args.id}`,`reviews:user:${context.user.id}`]; // Invalidate all queries related to this user's reviews
 };
 
 const getReviewCacheKeyBuilder = (_: any, args: { id: string }, context: any) => {
-  return `review:user:${context.user.id}:id:${args.id}`;
+  return `review:id:${args.id}`;
 };
 
+const getReviewsCacheKeyBuilder = (_: any, args: any, context: any) => {
+  return `reviews:user:${context.user.id}`;
+}; 
 
 
-
-const createReview = withCacheInvalidation(
-  reviewCacheKeyBuilder,
-  asyncWrapper(async (_: any, arg: 
+const createReview = asyncWrapper(async (_: any, arg: 
     { businessId: string,
       rating: number, 
       comment?: string }, context: any) => {
@@ -35,12 +35,12 @@ const createReview = withCacheInvalidation(
 
     return newReview;
   })
-);
+
 
 
 const getReviews = withCache(
   // Key Builder
-  getReviewCacheKeyBuilder,
+  getReviewsCacheKeyBuilder,
   asyncWrapper(async (_: any, args: any, context: any, info: any) => {
     const fields = graphqlFields(info);
     const query = await buildPrismaQuery(fields);
