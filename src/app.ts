@@ -54,7 +54,7 @@ app.use("/health",(req,res)=>res.status(200).json({message:"Server running"}))
 
 
 app.use(morgan('dev'))
-startKeepAlivePing(`${process.env.SELF_UR}/health`);    
+startKeepAlivePing(`${process.env.SELF_URL}/health`);    
   
   // app.get('/', (req, res) => {
   //    res.send('Hello, World!');
