@@ -6,15 +6,17 @@ import { Role } from "@prisma/client";
 import { withCache } from "@/utils/withCache";
 import { withCacheInvalidation } from "@/utils/withCache";
 
-const reviewCacheKeyBuilder = (_: any, __: any, context: any) => {
-  return [`reviews:user:${context.user.id}:*`]; // Invalidate all queries related to this user's reviews
+const reviewCacheKeyBuilder = (_: any, args:any, context: any) => {
+  return [`review:id:${args.id}`,`reviews:user:${context.user.id}`]; // Invalidate all queries related to this user's reviews
 };
 
 const getReviewCacheKeyBuilder = (_: any, args: { id: string }, context: any) => {
-  return `review:user:${context.user.id}:id:${args.id}`;
+  return `review:id:${args.id}`;
 };
 
-
+const getReviewsCacheKeyBuilder = (_: any, args: any, context: any) => {
+  return `reviews:user:${context.user.id}`;
+}; 
 
 
 const createReview = asyncWrapper(async (_: any, arg: 
@@ -35,13 +37,14 @@ const createReview = asyncWrapper(async (_: any, arg:
     });
 
     return newReview;
-  });
+  })
+
 
 
 const getReviews = withCache(
   // Key Builder
-  getReviewCacheKeyBuilder,
-  asyncWrapper(async (_: any, arg:{businessId:string}, context: any, info: any) => {
+  getReviewsCacheKeyBuilder,
+  asyncWrapper(async (_: any, args: any, context: any, info: any) => {
     const { user } = context;
     const fields = graphqlFields(info);
     const query = await buildPrismaQuery(fields);
@@ -49,7 +52,7 @@ const getReviews = withCache(
       throw new Error('Unauthorized: Only business owners or admins can view reviews');
     }
     const reviews = await prisma.review.findMany({
-      where: { businessId: arg.businessId },
+      where: { businessId: args.businessId },
       include: query,
     });
     return reviews;
