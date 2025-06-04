@@ -11,8 +11,43 @@ type Product {
   updatedAt: String!
 }
 
+input ProductFilterInput {
+  nameContains: String
+  tagsIn: [String!]
+  businessId: String
+  minPrice: Float
+  maxPrice: Float
+}
+
+input PaginationInput {
+  limit: Int
+  offset: Int
+}
+
+input ProductSortInput {
+  field: ProductSortableField
+  order: SortOrder
+}
+
+enum ProductSortableField {
+  name
+  price
+  createdAt
+}
+
+enum SortOrder {
+  ASC
+  DESC
+}
+
+
 extend type Query{
-  product(id: ID!): Product
+  product(id: ID!): Product!
+  products(
+    filter: ProductFilterInput
+    pagination: PaginationInput
+    sort: ProductSortInput
+  ): [Product!]!
 }
 
 extend type Mutation{

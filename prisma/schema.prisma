@@ -161,8 +161,8 @@ model Review {
   comment         String?
   businessId      String
   customerUserId  String
-  createdAt       DateTime      @default(now())
-
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
   business        Business      @relation(fields: [businessId], references: [id])
   customerUser    CustomerUser  @relation(fields: [customerUserId], references: [id])
 }
