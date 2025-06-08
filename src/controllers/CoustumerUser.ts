@@ -13,17 +13,17 @@ type registerUserArgs = {
 }
 const registerUser = asyncWrapper(async(_:any,args:registerUserArgs,context:any) => {
     const {name,email,phone,businessId}=args;
-    const {clerkUser}=context;
+    const {user}=context;
     
-    const userExists = await prisma.customerUser.findUnique({
-        where: { clerkId:clerkUser.id },
+    const userExists = await prisma.customerUser.findFirst({
+        where: { email:email },
     });
     if (userExists) {
         throw new Error("User already exists");
     }
     const newUser = await prisma.customerUser.create({
         data: {
-            clerkId:clerkUser.id,
+            clerkId:user.clerkId,
             name: name,
             email: email,
             phone: phone,

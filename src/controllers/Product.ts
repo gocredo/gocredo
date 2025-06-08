@@ -31,10 +31,6 @@ const createProduct = asyncWrapper(async (_: any, arg: {
 }, context: any) => {
   const { user } = context;
 
-  if (user.role !== Role.BUSINESS_OWNER && user.role !== Role.ADMIN) {
-    throw new Error('Unauthorized: Only business owners or admins can create products');
-  }
-
   const newProduct = await prisma.product.create({
     data: {
       name: arg.name,
@@ -65,9 +61,7 @@ const updateProduct = withCacheInvalidation(
     imageUrl?: string;
   }, context: any) => {
     const { user } = context;
-    if (user.role !== Role.BUSINESS_OWNER && user.role !== Role.ADMIN) {
-      throw new Error('Unauthorized: Only business owners or admins can update products');
-    }
+
 
     const updatedProduct = await prisma.product.update({
       where: { id: arg.id },
@@ -91,29 +85,39 @@ const deleteProduct = withCacheInvalidation(
   productCacheKeyBuilder,
   asyncWrapper(async (_: any, arg: { id: string }, context: any) => {
     const { user } = context;
-    if (user.role !== Role.BUSINESS_OWNER && user.role !== Role.ADMIN) {
-      throw new Error('Unauthorized: Only business owners or admins can delete products');
-    }
 
-    const deletedProduct = await prisma.product.delete({
+    const existingProduct = await prisma.product.findUnique({
       where: { id: arg.id },
     });
 
-    return deletedProduct;
+    if (!existingProduct) {
+      throw new Error('Product not found');
+    }
+    await prisma.product.delete({
+      where: { id: arg.id },
+    });
+
+    return true;
   })
 );
 
-const getProductById = asyncWrapper(async (_: any, arg: { id: string }, context: any) => {
-  const product = await prisma.product.findUnique({
-    where: { id: arg.id },
-  });
+const getProductById = withCache(
+  productsCacheKeyBuilder,
+  asyncWrapper(async (_: any, arg: { id: string }, context: any,info:any) => {
+    const requestedFields = graphqlFields(info);
+    const prismaQuerybuilder = await buildPrismaQuery(requestedFields);
+    const product = await prisma.product.findUnique({
+      where: { id: arg.id },
+      include: prismaQuerybuilder,
+    });
 
-  if (!product) {
-    throw new Error('Product not found');
-  }
+    if (!product) {
+      throw new Error('Product not found');
+    }
 
-  return product;
-});
+    return product;
+  })
+);
 
 
 const products = withCache(

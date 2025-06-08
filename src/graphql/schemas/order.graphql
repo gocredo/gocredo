@@ -1,8 +1,21 @@
+input OrderItemInput {
+  productId: ID!
+  quantity: Int!
+  price: Float
+}
+
+type OrderItem {
+  productId: ID!
+  quantity: Int!
+  price: Float
+}
+
 type Order {
   id: ID!
   businessId: ID!
   type: OrderType!
-  items: JSON
+  items: [OrderItem!]!
+  itemsCount: Int!
   totalAmount: Float!
   customerUserId: ID
   status: OrderStatus!
@@ -10,21 +23,24 @@ type Order {
   updatedAt: String!
 }
 
-extend type Query{
-    order(id: ID!): Order
+extend type Query {
+  order(id: ID!): Order
+  orders(businessId: ID, customerUserId: ID, status: OrderStatus, sortOrder: SortOrder): [Order!]!
 }
 
-extend type Mutation{
-    createOrder(
+extend type Mutation {
+  createOrder(
     businessId: ID!
     type: OrderType!
-    items: JSON!
+    items: [OrderItemInput!]!
     totalAmount: Float!
-    customerUserId: ID
+    customerUserId: ID!
   ): Order!
+
   updateOrder(
     id: ID!
     status: OrderStatus
   ): Order!
+
   deleteOrder(id: ID!): Boolean!
 }

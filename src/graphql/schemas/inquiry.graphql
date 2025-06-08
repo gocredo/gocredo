@@ -4,8 +4,8 @@ type Inquiry {
   name: String!
   email: String!
   message: String!
-  createdAt: String!
-  updatedAt: String!
+  createdAt: String
+  updatedAt: String
 }
 extend type Query{
     inquiry(id: ID!): Inquiry
@@ -14,10 +14,12 @@ extend type Query{
 extend type Mutation {
   createInquiry(
     businessId: ID!
+    phone: String!
     name: String!
     email: String!
     message: String!
-  ): Inquiry!
-  updateInquiry(id: ID!, name: String, email: String, message: String): Inquiry!
+    captchaToken: String!
+  ): Inquiry
+  updateInquiry(id: ID!, phone: String, name: String, email: String, message: String): Inquiry!
   deleteInquiry(id: ID!): Boolean!
 }

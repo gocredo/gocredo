@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>CAPTCHA Test</title>
+    <script src="https://www.google.com/recaptcha/api.js?render=6LcYr1crAAAAAMTGCY_XUDz4WwvrhGEWykq8y6Pl"></script>
+  </head>
+  <body>
+    <h1>Get reCAPTCHA Token</h1>
+    <button onclick="getToken()">Get Token</button>
+
+    <p>Token:</p>
+    <textarea id="tokenBox" rows="5" cols="60"></textarea>
+
+    <script>
+      function getToken() {
+        grecaptcha.ready(function () {
+          grecaptcha.execute('6LcYr1crAAAAAMTGCY_XUDz4WwvrhGEWykq8y6Pl', { action: 'submit' }).then(function (token) {
+            document.getElementById('tokenBox').value = token;
+          });
+        });
+      }
+    </script>
+  </body>
+</html>

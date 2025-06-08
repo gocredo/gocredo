@@ -7,6 +7,12 @@ import { customerResolvers } from './resolvers/Coustumer.resolvers';
 import { blogResolvers } from './resolvers/blog.resolver';
 import { reviewResolvers } from './resolvers/review.resolvers';
 import { productResolvers } from './resolvers/product.resolvers';
+import { menuResolvers } from './resolvers/menu.resolvers';
+import { menuItemResolvers } from './resolvers/menuItem.resolver';
+import { bookingResolvers } from './resolvers/booking.resolver';
+import { inquiryResolvers } from './resolvers/inquiry.resolvers';
+import { propertyResolvers } from './resolvers/property.resolvers';
+import { orderResolvers } from './resolvers/orders.resolvers';
 
 export const graphQLResolver = mergeResolvers([
   userResolvers,
@@ -17,4 +23,10 @@ export const graphQLResolver = mergeResolvers([
   blogResolvers,
   reviewResolvers,
   productResolvers,
+  menuResolvers,
+  menuItemResolvers,
+  bookingResolvers,
+  inquiryResolvers,
+  propertyResolvers,
+  orderResolvers,
 ]);

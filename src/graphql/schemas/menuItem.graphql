@@ -12,7 +12,7 @@ extend type Query{
 }
 
 extend type Mutation{
-    createMenuItem(menuId: ID!, name: String!, price: Float!, imageUrl: String): MenuItem!
+  createMenuItem(menuId: ID!, name: String!, price: Float!, imageUrl: String): MenuItem!
   updateMenuItem(id: ID!, name: String, price: Float, imageUrl: String): MenuItem!
   deleteMenuItem(id: ID!): Boolean!
 }

@@ -2,7 +2,7 @@ type CustomerUser {
   id: ID!
   businessId: ID!
   name: String!
-  email: String
+  email: String!
   phone: String
   createdAt: String!
   updatedAt: String!

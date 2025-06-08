@@ -190,8 +190,12 @@ model Inquiry {
   name       String
   email      String
   message    String
+  phone      String
   businessId String
   business   Business @relation(fields: [businessId], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime? @updatedAt
+
 }
 
 model BusinessInquiry {
@@ -211,6 +215,8 @@ model Property {
   imageUrl    String?
   businessId  String
   business    Business @relation(fields: [businessId], references: [id])
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
 }
 
 model Donation {
@@ -237,6 +243,7 @@ model Order {
   id             String        @id @default(uuid())
   type           OrderType
   items          Json
+  itemsCount     Int
   totalAmount    Float
   status         OrderStatus   @default(PENDING)
   customerUserId String?
@@ -316,6 +323,7 @@ enum Role {
   ADMIN
   BUSINESS_OWNER
   STAFF
+  CUSTOMER
 }
 
 enum BusinessCategory {
@@ -364,18 +372,23 @@ enum AppointmentStatus {
 }
 
 enum OrderType {
-  PRODUCT
-  MENU_ITEM
-  APPOINTMENT
-  DONATION
-  CUSTOM
+  ONLINE
+  PICKUP
+  IN_STORE
+  DELIVERY
 }
 
 enum OrderStatus {
   PENDING
-  PAID
+  CONFIRMED
   CANCELLED
-  FULFILLED
+  COMPLETED
+  REFUNDED
+}
+
+enum SortOrder{
+  asc
+  desc
 }
 
 enum SubscriptionStatus {
